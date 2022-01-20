@@ -100,7 +100,7 @@
 	<!-- TO DO: Add support for Maven WAR Plugin -->
 	
 	<build>
-		<finalName>spring-security-demo</finalName>
+		<finalName>maven-spring-mvc-sse</finalName>
 		
 		
 		<pluginManagement>

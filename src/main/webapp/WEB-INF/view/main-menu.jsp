@@ -17,13 +17,17 @@
 	<br>
 	<a href="address/list">Address List</a>
 	<br>
-	<a href="sse">ClientListen List</a>
+	<a href="testSse">ClientListen List-test01</a>
 	<br>
-	<a href="sse">ClientListen List</a>
+	<a href="sse">ClientListen List-test02</a>
 	
-
-		<script>
+	<div id="prova1"></div>
+	
+		<script type="text/javascript">
 			console.log("prova");
+			var el = document.getElementById('prova1');
+		    el.appendChild(document.createTextNode("messaggio" + "***"));
+		    el.appendChild(document.createElement('br'));
 	    </script> 
 
 </body>
