@@ -17,9 +17,9 @@
 	<br>
 	<a href="address/list">Address List</a>
 	<br>
-	<a href="testSse">ClientListen List-test01</a>
+	<a href="testSse1">ClientListen List-test01</a>
 	<br>
-	<a href="sse">ClientListen List-test02</a>
+	<a href="testSse2">ClientListen List-test02</a>
 	
 	<div id="prova1"></div>
 	
