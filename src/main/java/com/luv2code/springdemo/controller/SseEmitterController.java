@@ -64,17 +64,19 @@ public class SseEmitterController {
 	   //create a single thread for sending messages asynchronously
 	   ExecutorService executor = Executors.newSingleThreadExecutor();
 	   
-	   SseEmitter.SseEventBuilder sseEventBuilder = SseEmitter.event()
-	             .id("0") // You can give nay string as id
-	             .name("customEventName")
-	             .data("message1")
-	             .reconnectTime(10000); //reconnect time in millis
+
 	   
 	   executor.execute(() -> {	
 		   try {
 	           for (int i = 0; i < 8; i++) {
+	    		   int j;
 	        	   Thread.sleep(800);
-	        	   sseEventBuilder.data("chiamata" + i);
+	        	   j = i+1;
+	        	   SseEmitter.SseEventBuilder sseEventBuilder = SseEmitter.event()
+	      	             .id(String.valueOf(i)) // You can give nay string as id
+	      	             .name("customEventName")
+	      	             .data("chiamata " + j)
+	      	             .reconnectTime(10000); //reconnect time in millis
 	        	   emitter.send(sseEventBuilder);          
 	           } 
 			   		
