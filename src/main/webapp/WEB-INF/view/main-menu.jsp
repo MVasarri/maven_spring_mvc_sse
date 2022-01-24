@@ -20,6 +20,11 @@
 	<a href="testSse1">ClientListen List-test01</a>
 	<br>
 	<a href="testSse2">ClientListen List-test02</a>
+	<br>
+	<a href="sseNews">subscribe</a>
+	<br>
+	<a href="newsSender">News Sender</a>
+	<br>
 	
 	<div id="prova1"></div>
 	

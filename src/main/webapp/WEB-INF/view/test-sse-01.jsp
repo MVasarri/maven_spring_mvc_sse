@@ -90,16 +90,6 @@
 				event.target.close();
 		});
 	 
-	 
-/* 
- 		var sse = new EventSource('http://localhost:8080/maven_spring_mvc_sse/sse');
-		sse.onmessage = function (evt) {
-		    var el = document.getElementById('sseM1');
-		    console.log(evt.data );
-		    el.appendChild(document.createTextNode(evt.data + "  prova"));
-		    el.appendChild(document.createElement('br'));
-		};  
-  */
   
 	</script> 
 </body>

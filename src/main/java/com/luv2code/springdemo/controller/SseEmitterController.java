@@ -32,7 +32,10 @@ public class SseEmitterController {
     public String showPage2() {
         return "test-sse-02";
     }
-
+    
+    final ExecutorService nonBlockingService = Executors
+            .newCachedThreadPool();
+    
     @GetMapping("/sse1")
     public SseEmitter eventEmitter() {
         SseEmitter emitter = new SseEmitter(); //12000 here is the timeout and it is optional   (long) 12000
@@ -90,9 +93,6 @@ public class SseEmitterController {
         // invia evento a tutti gli emitter
     }
     
-    
-    final ExecutorService nonBlockingService = Executors
-            .newCachedThreadPool();
 
     @GetMapping("/sse3")
     public SseEmitter handleSse() {
