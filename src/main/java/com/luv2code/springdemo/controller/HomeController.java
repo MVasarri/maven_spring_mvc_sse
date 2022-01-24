@@ -10,5 +10,15 @@ public class HomeController {
 	public String showPage( ) {
 		return "main-menu";
 	}
+	
+	@RequestMapping("/sseNews")
+	public String showPageNews( ) {
+		return "sse-news";
+	}
+	
+	@RequestMapping("/newsSender")
+	public String showPageNewsSender( ) {
+		return "news-sender";
+	}
 
 }

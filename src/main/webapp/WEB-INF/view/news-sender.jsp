@@ -24,7 +24,7 @@
 					<input type="submit" value="Save" class="save" />
 		</form:form> -->
 		<script >
-/* 			function postData() {
+/*  			function postData() {
 				var title = 'messaggio corto 1';
 				var text =	'prova di un messaggio lungo ma non tanto 1';
 				const data = { title, text};
@@ -36,10 +36,10 @@
 						body: JSON.stringify(data)
 				};
 				
-				const response = fetch('/maven_spring_mvc_sse/dispatchEvent',options);
-			}
-			 */
-			 function sendNews(){
+				const response = fetch('/maven_spring_mvc_sse/dispatchEvent', options);
+			} */
+			 
+/*  			 function sendNews(){
 				 var url = "http://localhost:8080/maven_spring_mvc_sse/dispatchEvent";
 
 				 var xhr = new XMLHttpRequest();
@@ -58,10 +58,29 @@
 				   "text": "Prova secondo messaggio un po piu lungo",
 				 }`;
 
-				 xhr.send(data);
-				 
+				 xhr.send(data);	 
+			 } */
+			 
+			 function sendNews(){
+
+				 var xhr = new XMLHttpRequest();
+				 xhr.open("POST", 'http://localhost:8080/maven_spring_mvc_sse/dispatchEvent', true);
+	
+				 //Send the proper header information along with the request
+				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	
+				 xhr.onreadystatechange = function() { // Call a function when the state changes.
+				     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+				         console.log("inviato: " + this.status)
+				     }
+				 }
+				 xhr.send("title=bar&text=ipsum");
+				 // xhr.send(new Int8Array());
+				 // xhr.send(document);
 			 }
-		
+			 
+			 
+		 
 		</script>
 		
 		

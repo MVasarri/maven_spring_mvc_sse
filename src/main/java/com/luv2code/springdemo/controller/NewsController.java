@@ -14,19 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Controller	
+@RestController	
 public class NewsController {
-	
-	
-	@RequestMapping("/sseNews")
-	public String showPageNews( ) {
-		return "sse-news";
-	}
-	
-	@RequestMapping("/newsSender")
-	public String showPageNewsSender( ) {
-		return "news-sender";
-	}
 	
 	public List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 	
@@ -62,6 +51,7 @@ public class NewsController {
 				emitters.remove(emitter);
 			}
 		}
+		
 	}
 	
 	
