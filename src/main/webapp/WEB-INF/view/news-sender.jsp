@@ -14,6 +14,11 @@
 				   class="add-button"
 			/>
 			
+			<input type="button" value="sendJSON"
+				   onclick= "sendJSON()"; return false;"
+				   class="add-button"
+			/>
+			
 		
 		
 <!-- 		<form:form action="dispatchEvent" modelAttribute="address" method="POST">
@@ -22,9 +27,11 @@
 
 					<label></label>
 					<input type="submit" value="Save" class="save" />
-		</form:form> -->
-		<script >
-/*  			function postData() {
+			</form:form> -->
+			
+		<script type="text/javascript">
+
+  			 function  sendJSON() {
 				var title = 'messaggio corto 1';
 				var text =	'prova di un messaggio lungo ma non tanto 1';
 				const data = { title, text};
@@ -36,35 +43,46 @@
 						body: JSON.stringify(data)
 				};
 				
-				const response = fetch('/maven_spring_mvc_sse/dispatchEvent', options);
-			} */
+				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
+			}   
+			 		 
+/*  			 function sendJSON(){		
+				 	
+				 	const title = "messaggio 1";
+				 	const text =  "vediamo de questo messaggio va";
+				 
+		            // Creating a XHR object
+		            var xhr = new XMLHttpRequest();
+		            var url = '/maven-spring-mvc-sse/dispatchEvent2';
+		       
+		            // open a connection
+		            xhr.open("POST", url, true);
+		 
+		            // Set the request header i.e. which type of content you are sending
+		            xhr.setRequestHeader("Content-Type", "application/json");
+		 
+		            // Create a state change callback
+		            xhr.onreadystatechange = function () {
+		                if (xhr.readyState === 4 && xhr.status === 200) {
+		                    // Print received data from server
+		                    //result.innerHTML = this.responseText;
+		                    console.log("inviato: " + this.status)
+		                    console.log(xhr.responseText);
+		                }
+		            };
+		 
+		            // Converting JSON data to string
+		            var data = { "title": "messaggio 1", "text": "vediamo de questo messaggio va" };
+		 
+		            // Sending data with the request
+		            xhr.send(JSON.stringify(data));
+		            //xhr.send(data);
+		        }  */
 			 
-/*  			 function sendNews(){
-				 var url = "http://localhost:8080/maven_spring_mvc_sse/dispatchEvent";
+   			 function sendNews(){
 
 				 var xhr = new XMLHttpRequest();
-				 xhr.open("POST", url);
-
-				 xhr.setRequestHeader("Accept", "application/json");
-				 xhr.setRequestHeader("Content-Type", "application/json");
-
-				 xhr.onreadystatechange = function () {
-				    if (xhr.readyState === 4) {
-				       console.log(xhr.responseText);
-				    }};
-
-				 var data = `{
-				   "title": "Messaggio 1",
-				   "text": "Prova secondo messaggio un po piu lungo",
-				 }`;
-
-				 xhr.send(data);	 
-			 } */
-			 
-			 function sendNews(){
-
-				 var xhr = new XMLHttpRequest();
-				 xhr.open("POST", 'http://localhost:8080/maven_spring_mvc_sse/dispatchEvent', true);
+				 xhr.open("POST", 'http://localhost:8080/maven-spring-mvc-sse/dispatchEvent', true);
 	
 				 //Send the proper header information along with the request
 				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -77,7 +95,7 @@
 				 xhr.send("title=bar&text=ipsum");
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
-			 }
+			 }  
 			 
 			 
 		 

@@ -28,7 +28,7 @@
  		(function() {
  		   // your page initialization code here
  		   // the DOM will be available here
- 	 	   const eventSource = new EventSource('http://localhost:8080/maven_spring_mvc_sse/subscribe'); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
+ 	 	   const eventSource = new EventSource('http://localhost:8080/maven-spring-mvc-sse/subscribe'); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
  	 	   
  	 	   eventSource.addEventListener("latestNews", (event) => {
 				const articleData = JSON.parse(event.data);
