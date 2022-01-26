@@ -1,0 +1,99 @@
+file logback-spring.xml
+
+<configuration>
+
+	<!-- indica che avremo una directory chiamata log dove  tutti i nostri log vivranno -->
+	<property name="LOGS" value="./logs" />
+ 
+ 	<!-- indica che registreremo sulla console usando questo formato-->
+    <appender name="Console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- %d  indica che stampera prima la data, 
+            	 [%thread] i thread durante l'esecuzione
+            	 %-5level i 5 caratteri di registrazione INFO,ERROR,WARN,DEBUG,ecc..  
+            	 %logger{36} è il loggere che stra producendo il messaggio,
+            	 %msg il messaggio stesso  
+            	 %n simbolo di nuova riga -->
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+ 
+ 	<!-- l'appender di file in sequenza, cioè che cominci con un file di registro e poi 
+ 			quando lo riempi o superiamo il limite di data o ora eseguiamo il backup di quel file e ne creiamo uno nuovo -->
+    <appender name="RollingFile"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/spring-boot-logger.log</file>
+        <encoder
+            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--	%d  indica che stampera prima la data, 
+            		%t thread, %m message %n new line
+            	  -->
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+ 
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <!-- quindi la directory da dove parte, ${LOGS} poi le varie cartelle aggiuntive e il nome del file
+            	 %i indica il numero del file quando il log spezza in più file perchè raggiunge la dimenzione massima -->
+            <fileNamePattern>${LOGS}/archived/spring-logger-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+	 	<!-- questa versione di l'appender di file in sequenza denominata SevereRollingFile 
+	 		 ha un filtro che le consente soltanto di catturare i messaggi di WARN 
+	 		 così da renderli più visibili in un altro file più pulito-->
+    <appender name="SevereRollingFile"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/severe-logger.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder
+            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+ 
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/severe-logger-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <!-- qui puoi cambiare direttamente a tutti il livello se hai assegnato il tag %logger{36}
+    	 e puoi mettere INFO,DEBUG, WARN,ERROR,ecc...-->
+    <root level="debug">
+        <appender-ref ref="Console" />
+    </root>
+     
+    <!-- LOG "com.com.luv2code.springdemo.*" at TRACE level -->
+    <!-- qui indichi dove si trova il pacchetto -->
+    <logger name="com.luv2code.springdemo" level="trace" additivity="false">
+        <!-- indichi dove appendere i vari log se sulla console sui file e cosi via -->
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+        <appender-ref ref="SevereRollingFile" />
+    </logger>
+
+	<logger name="org.springframework" level="debug" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+
+</configuration>
+

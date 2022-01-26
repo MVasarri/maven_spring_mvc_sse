@@ -13,8 +13,6 @@
 		<springframework.version>5.0.2.RELEASE</springframework.version>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<logback.version>	1.2.10</logback.version>
-		<jcl.slf4j.version>1.7.35</jcl.slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -39,18 +37,22 @@
 			<version>${springframework.version}</version>
 		</dependency>
 		
-		<!-- 2. Bridge logging from JCL to SLF4j-->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${jcl.slf4j.version}</version>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-core</artifactId>
+		  <version>1.2.10</version>
 		</dependency>
-	
-		<!-- 3. logback -->
+		
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-classic</artifactId>
+		  <version>1.2.10</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-api</artifactId>
+		  <version>1.7.35</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-orm -->
