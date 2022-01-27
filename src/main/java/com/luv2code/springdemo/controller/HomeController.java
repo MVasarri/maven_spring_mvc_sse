@@ -10,15 +10,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
 	
     private static final Logger logger 
-    = LoggerFactory.getLogger(HomeController.class);
+    	= LoggerFactory.getLogger(HomeController.class);
 	
-	public static void main(String[] args) {
-        logger.info("Example log from {}", HomeController.class.getSimpleName());
-
-	}
-	
+//	public static void main(String[] args) {
+//        logger.info("Example log from {}", HomeController.class.getSimpleName());
+//
+//	}
+//	
 	@RequestMapping("/")
 	public String showPage( ) {
+		
+		logger.trace("1. Log a message at the TRACE level");
+		logger.debug("2. Log a message at the DEBUG level");
+		logger.info("3. Log a message at the INFO level");
+		logger.warn("4. Log a message at the WARN level");
+		logger.error("5. Log a message at the ERROR level");
+
+		
 		return "main-menu";
 	}
 	

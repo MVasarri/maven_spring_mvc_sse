@@ -25,7 +25,7 @@ file logback-spring.xml
  			quando lo riempi o superiamo il limite di data o ora eseguiamo il backup di quel file e ne creiamo uno nuovo -->
     <appender name="RollingFile"
         class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/spring-boot-logger.log</file>
+        <file>${LOGS}/spring-logger.log</file>
         <encoder
             class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--	%d  indica che stampera prima la data, 
@@ -91,7 +91,7 @@ file logback-spring.xml
     </logger>
 
 	<logger name="org.springframework" level="debug" additivity="false">
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="Console" />
 	</logger>
 
 

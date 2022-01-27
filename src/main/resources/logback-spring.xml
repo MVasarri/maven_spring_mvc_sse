@@ -1,12 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
+<configuration debug="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+ 	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>tests-log-${bySecond}.txt</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    
+    <logger name="com.luv2code.springdemo.*" level="trace" > 
+           	<appender-ref ref="STDOUT" />
+            <appender-ref ref="FILE" /> 
+     </logger> 
+    
+<!--     <logger name="com.luv2code.springdemo.tests" level="WARN"> 
+        <appender-ref ref="FILE" /> 
+    </logger>  -->
 
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <root level="debug">
+        <appender-ref ref="FILE" />
+    </root>
 </configuration>
