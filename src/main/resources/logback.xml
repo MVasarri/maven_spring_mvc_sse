@@ -1,17 +1,34 @@
 <configuration debug="true">
+	
+	  <!--	GLOSSARIO:
+       		 	 %d  indica che stampera prima la data, 
+            	 [%thread] i thread durante l'esecuzione
+            	 %-5level i 5 caratteri di registrazione TRACE,DEBUG,INFO,WARN,ERROR 
+            	 %logger{36} è il loggere che stra producendo il messaggio,
+            	 %msg il messaggio stesso  
+            	 %n simbolo di nuova riga 
+      -->
+	 <!-- indica che registreremo sulla console usando questo formato-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
+
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     
+    
+    <property name="LOGS" value="/Log_My_Project" />
+     <!-- l'appender di file in sequenza, cioè che cominci con un file di registro e poi 
+ 			quando lo riempi o superiamo il limite di data o ora eseguiamo il backup di quel file e ne creiamo uno nuovo 
+ 	-->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/home/stefano/temp</file>
-
+        <!-- assegnamo una variabile globale la cartella dei file di log del progetto,
+        	 quindi i log andranno in nella della directori globale del pc qui assegnata -->
+        <file>${LOGS}/maven_spring_mvc_sse/logs.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOGS}/maven_spring_mvc_sse/archived/app.%d{yyyy-MM-dd}.%i.log.gz </fileNamePattern>
             <!-- each archived file, size max 10MB -->
             <maxFileSize>10MB</maxFileSize>
             <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
@@ -19,7 +36,29 @@
             <!-- 60 days to keep -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
-
+        <encoder>
+            <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+        </encoder>
+    </appender>
+    
+     <!-- l'appender meno loquace che stampa solo pe WARN e gli EROR 
+	 -->
+     <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- assegnamo una variabile globale la cartella dei file di log del progetto,
+        	 quindi i log andranno in nella della directori globale del pc qui assegnata -->
+        <file>${LOGS}/maven_spring_mvc_sse/logs_levWARN.log</file>
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/maven_spring_mvc_sse/archived/app.%d{yyyy-MM-dd}.%i.log_levWARN.gz </fileNamePattern>
+            <!-- each archived file, size max 10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
+            <totalSizeCap>20GB</totalSizeCap>
+            <!-- 60 days to keep -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
         <encoder>
             <pattern>%d %p %c{1.} [%t] %m%n</pattern>
         </encoder>
@@ -27,8 +66,12 @@
     
     
     <logger name="com.luv2code.springdemo" level="trace" additivity="false"> 
+    	<!-- indichi dove appendere i vari log del pacchetto "com.luv2code.springdemo", 
+    		es sia sulla console che sul file 
+    	-->
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" /> 
+        <appender-ref ref="FILE_WARN" />
     </logger> 
     
     <logger name="org.springframework" level="info" > 

@@ -11,12 +11,7 @@ public class HomeController {
 	
     private static final Logger logger 
     	= LoggerFactory.getLogger(HomeController.class);
-	
-//	public static void main(String[] args) {
-//        logger.info("Example log from {}", HomeController.class.getSimpleName());
-//
-//	}
-//	
+		
 	@RequestMapping("/")
 	public String showPage( ) {
 		
@@ -26,7 +21,6 @@ public class HomeController {
 		logger.warn("4. Log a message at the WARN level");
 		logger.error("5. Log a message at the ERROR level");
 
-		
 		return "main-menu";
 	}
 	
