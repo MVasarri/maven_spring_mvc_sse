@@ -62,10 +62,14 @@ public class NewsController {
             logger.debug("stampa la lista di Sse, dopo la rimozione onCompletion' \n {}", emitters);
         });
 
-        sseEmitter.onTimeout(() -> emitters.remove(sseEmitter));
-        logger.debug("stampa la lista di Sse, dopo la rimozione onTimeout' \n {}", emitters);
-        sseEmitter.onError((e) -> emitters.remove(sseEmitter));
-        logger.debug("stampa la lista di Sse, dopo la rimozione onError' \n {}", emitters);
+        sseEmitter.onTimeout(() -> {
+            emitters.remove(sseEmitter);
+            logger.debug("stampa la lista di Sse, dopo la rimozione onTimeout' \n {}", emitters);
+        });
+        sseEmitter.onError((e) -> {
+            emitters.remove(sseEmitter);
+            logger.debug("stampa la lista di Sse, dopo la rimozione onError' \n {}", emitters);
+        });
 
         return sseEmitter;
     }
