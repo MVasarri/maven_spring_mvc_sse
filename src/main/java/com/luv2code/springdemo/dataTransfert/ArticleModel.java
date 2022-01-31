@@ -1,4 +1,4 @@
-package com.luv2code.springdemo.dataTransfert;
+ package com.luv2code.springdemo.dataTransfert;
 
 public class ArticleModel {
 	private String title;

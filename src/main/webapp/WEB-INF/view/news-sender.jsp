@@ -7,15 +7,23 @@
 <title>Insert title here</title>
 </head>
 <body>
-			<h1>Prova</h1>			
+			<h1>Invia News</h1>	
+			<input type="text" id="myInPutID" value=""
+				   class="add-text"
+			/>		
 
-			<input type="button" value="sendNews"
-				   onclick= "sendNews()"; return false;"
+			<input type="button" value="sendNewsAll"
+				   onclick= "sendNewsAll()"; return false;"
 				   class="add-button"
 			/>
 			
-			<input type="button" value="sendJSON"
-				   onclick= "sendJSON()"; return false;"
+			<input type="button" value="sendNewsByID"
+				   onclick= "sendNewsByID()"; return false;"
+				   class="add-button"
+			/>
+			
+			<input type="button" value="sendJSON_All"
+				   onclick= "sendJSON_All()"; return false;"
 				   class="add-button"
 			/>
 			
@@ -31,9 +39,9 @@
 			
 		<script type="text/javascript">
 
-  			 function  sendJSON() {
-				var title = 'messaggio corto 1';
-				var text =	'prova di un messaggio lungo ma non tanto 1';
+  			 function  sendJSON_All() {
+				var title = 'JSON News All sub';
+				var text =	'Questa notizia è gestita mediante l\' invio di un messaggio di tipo JSON';
 				const data = { title, text};
 				const options = {
 						method : 'POST',
@@ -79,7 +87,7 @@
 		            //xhr.send(data);
 		        }  */
 			 
-   			 function sendNews(){
+   			 function sendNewsAll(){
 
 				 var xhr = new XMLHttpRequest();
 				 xhr.open("POST", 'http://localhost:8080/maven-spring-mvc-sse/dispatchEvent', true);
@@ -92,7 +100,27 @@
 				         console.log("inviato: " + this.status)
 				     }
 				 }
-				 xhr.send("title=bar&text=ipsum");
+				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed è gestita  con il metodo application/x-www-form-urlencoded");
+				 // xhr.send(new Int8Array());
+				 // xhr.send(document);
+			 }  
+		     
+   			 function sendNewsByID(){
+				 /* const subID = 21 */
+				 const subID = document.getElementById("myInPutID").value;
+				 console.log(subID);
+				 var xhr = new XMLHttpRequest();
+				 xhr.open("POST", 'http://localhost:8080/maven-spring-mvc-sse/dispatchEventToSpecificUser', true);
+	
+				 //Send the proper header information along with the request
+				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	
+				 xhr.onreadystatechange = function() { // Call a function when the state changes.
+				     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+				         console.log("inviato: " + this.status)
+				     }
+				 }
+				 xhr.send("title=News dedicata&text=Questa notizia arriva solo a chi ha l'ID: " + subID + "&userID="+ subID);
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  

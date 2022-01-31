@@ -15,40 +15,63 @@
 </style>
 </head>
 <body>		
+
+<div>
+	<h1>News sse client</h1>
+	<h4>User ID: <span id="userID"></span></h4>
+</div>
+
+<div class="grid-container">
+	<div id="sseNews1"></div> 
+</div>
+
+<script type="text/javascript">
+	
+	(function() {
+		var userID = Math.floor((Math.random() * 1000) + 1);
+  		var sp1 = document.getElementById('userID');
+		sp1.textContent = userID;
 		
-		
-		<h1>News sse client</h1>
-		<div class="grid-container">
-			  <div id="sseNews1"></div>
-			  <div id="sseM2"></div> 
-		</div>
-		
-		<script type="text/javascript">
-			
- 		(function() {
- 		   // your page initialization code here
- 		   // the DOM will be available here
- 	 	   const eventSource = new EventSource('http://localhost:8080/maven-spring-mvc-sse/subscribe'); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
- 	 	   
- 	 	   eventSource.addEventListener("latestNews", (event) => {
-				const articleData = JSON.parse(event.data);
-				//const articleData = event.data;
- 	  		    console.log(articleData); 
-		  		var el = document.getElementById('sseNews1');
-			    el.appendChild(document.createTextNode(articleData.title));
-			    el.appendChild(document.createElement('br'));  
-			    el.appendChild(document.createTextNode(articleData.text));
-			    el.appendChild(document.createElement('br'));
-			    el.appendChild(document.createElement('br'));
+		//url dove va ad ascoltare l'evento SseEmitter
+		const url = 'http://localhost:8080/maven-spring-mvc-sse/subscribe?userID=' + userID;
+		//creo un evento per iscriversi al Sse
+ 		const eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
+		console.log(eventSource);
+  		
+ 		//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
+ 		eventSource.addEventListener("latestNews", (event) => {
+ 			console.log(event); 
+ 			const articleData = JSON.parse(event.data);
+ 			//const articleData = event.data;
+ 			console.log(articleData); 
+ 			var el = document.getElementById('sseNews1');
+ 			el.appendChild(document.createTextNode(articleData.title));
+ 			el.appendChild(document.createElement('br'));  
+ 			el.appendChild(document.createTextNode(articleData.text));
+ 			el.appendChild(document.createElement('br'));
+ 			el.appendChild(document.createElement('br'));
 		});
- 		   
- 		})();
- 		
- 		window.ombeforeunload = function () {
- 			evtSource.close();
- 		}
- 		</script>
- 		
+	
+ 		eventSource.addEventListener("error", (event) => {
+ 			console.log("Error: "+ event.currentTarget.readyState)
+ 			if (event.currentTarget.readyState == EventSource.CLOSED){
+ 			}
+ 			else {
+ 				evtSource.close();
+ 			}
+ 		});
+	})();
+	
+
+
+	// puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
+	
+	// onbeforeunload cioè quando la finestra viene scaricata chiude l'eventSources
+	window.onbeforeunload = function () {
+		evtSource.close();
+	}
+</script>
+
 
 </body>
 </html>
