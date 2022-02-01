@@ -27,47 +27,50 @@
 
         <script type="text/javascript">
 
-            (function () {
-                var userID = Math.floor((Math.random() * 1000) + 1);
-                var sp1 = document.getElementById('userID');
-                sp1.textContent = userID;
+				var userID = Math.floor((Math.random() * 1000) + 1);
+				var sp1 = document.getElementById('userID');
+				sp1.textContent = userID;
+				
+				//url dove va ad ascoltare l'evento SseEmitter
+				console.log("SUBSCRIBE");
+				const url = '/maven-spring-mvc-sse/subscribe?userID=' + userID;
+				//creo un evento per iscriversi al Sse
+				const eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
+				console.log(eventSource);
+				
+				//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
+				eventSource.addEventListener("latestNews", (event) => {
+				    console.log("Ricevuto evento", event);
+				    const articleData = JSON.parse(event.data);
+				    //const articleData = event.data;
+				    console.log(articleData);
+				    var el = document.getElementById('sseNews1');
+				    el.appendChild(document.createTextNode(articleData.title));
+				    el.appendChild(document.createElement('br'));
+				    el.appendChild(document.createTextNode(articleData.text));
+				    el.appendChild(document.createElement('br'));
+				    el.appendChild(document.createElement('br'));
+				});
+				
+				eventSource.onerror = (event) => {
+					if (event.readyState == EventSource.CLOSED) {
+					   	console.log('connection is closed');
+					} else {
+					   	console.log("Error occured: ", event);
+					}
+					event.target.close();
+				};
+				
+				// puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
+				
+				// onbeforeunload cioè quando la finestra viene scaricata chiude l'eventSources
+				window.addEventListener("beforeunload", function(event) { 
+					    console.log("on before unload");
+					    eventSource.close();
+					    fetch( '/unsubscribe?userID=' + userID );
+						console.log('cancellazione lanciata');
+				});
 
-                //url dove va ad ascoltare l'evento SseEmitter
-                console.log("SUBSCRIBE");
-                const url = 'http://localhost:8080/maven-spring-mvc-sse/subscribe?userID=' + userID;
-                //creo un evento per iscriversi al Sse
-                const eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
-                console.log(eventSource);
-
-                //creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
-                eventSource.addEventListener("latestNews", (event) => {
-                    console.log("Ricevuto evento", event);
-                    const articleData = JSON.parse(event.data);
-                    //const articleData = event.data;
-                    console.log(articleData);
-                    var el = document.getElementById('sseNews1');
-                    el.appendChild(document.createTextNode(articleData.title));
-                    el.appendChild(document.createElement('br'));
-                    el.appendChild(document.createTextNode(articleData.text));
-                    el.appendChild(document.createElement('br'));
-                    el.appendChild(document.createElement('br'));
-                });
-
-                eventSource.onerror = function () {
-                    console.log("Error");
-                    //eventSource.close();
-                };
-            })();
-
-
-
-            // puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
-
-            // onbeforeunload cioè quando la finestra viene scaricata chiude l'eventSources
-            window.onbeforeunload = function () {
-                console.log("on before unload");
-                eventSource.close();
-            }
         </script>
 
 

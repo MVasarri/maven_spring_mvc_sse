@@ -22,7 +22,7 @@
 		  <div id="sseM2"></div> 
 	</div>
 	<script type="text/javascript">
-	console.log("prova");
+		console.log("prova");
 		
  		const eventSource = new EventSource('http://localhost:8080/maven_spring_mvc_sse/sse1');
  		

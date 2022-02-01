@@ -90,7 +90,7 @@
    			 function sendNewsAll(){
 
 				 var xhr = new XMLHttpRequest();
-				 xhr.open("POST", 'http://localhost:8080/maven-spring-mvc-sse/dispatchEvent', true);
+				 xhr.open("POST", '/maven-spring-mvc-sse/dispatchEvent', true);
 	
 				 //Send the proper header information along with the request
 				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -100,7 +100,7 @@
 				         console.log("inviato: " + this.status)
 				     }
 				 }
-				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed è gestita  con il metodo application/x-www-form-urlencoded");
+				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed 	\xE8 è gestita  con il metodo application/x-www-form-urlencoded");
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  
@@ -110,7 +110,7 @@
 				 const subID = document.getElementById("myInPutID").value;
 				 console.log(subID);
 				 var xhr = new XMLHttpRequest();
-				 xhr.open("POST", 'http://localhost:8080/maven-spring-mvc-sse/dispatchEventToSpecificUser', true);
+				 xhr.open("POST", '/maven-spring-mvc-sse/dispatchEventToSpecificUser', true);
 	
 				 //Send the proper header information along with the request
 				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
