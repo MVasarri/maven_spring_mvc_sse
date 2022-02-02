@@ -52,14 +52,22 @@
 				    el.appendChild(document.createElement('br'));
 				});
 				
-				eventSource.onerror = (event) => {
-					if (event.readyState == EventSource.CLOSED) {
+				//eventSource.onerror = (event) => {
+				eventSource.addEventListener("error", (event) => {
+					console.log("Error occured: ", event);
+					console.log("EventSource.CLOSED: ", EventSource.CLOSED);
+					console.log("event.target.readyState: ", event.target.readyState);
+					console.log("STATO eventSource: ", eventSource.readyState);
+					if (event.target.readyState == EventSource.CLOSED) {
 					   	console.log('connection is closed');
 					} else {
-					   	console.log("Error occured: ", event);
+						console.log("STATO eventSource: ", eventSource.readyState);
+					   	//è il punto in cui riconosce che la connessione del client è stata persa
+					   	// TO-DO:
+					   	// 			gestire la riconnessione automatica
 					}
 					event.target.close();
-				};
+				});
 				
 				// puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
 				
@@ -68,7 +76,17 @@
 					    console.log("on before unload");
 					    eventSource.close();
 					    fetch( '/unsubscribe?userID=' + userID );
-						console.log('cancellazione lanciata');
+						console.log('unsubscribe lanciata');
+				});
+				
+				// addEventListener version
+				window.addEventListener('online', (event) => {
+				    console.log("You are now connected to the network.");
+/* 				    console.log("event: ",event);
+					if (eventSource.readyState == EventSource.CLOSED) {
+					    const eventSource = new EventSource(url); 
+						console.log('ricreata nuova connessione eventSource');
+					} */
 				});
 
         </script>
