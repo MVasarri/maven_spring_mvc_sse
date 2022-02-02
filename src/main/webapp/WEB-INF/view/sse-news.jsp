@@ -31,14 +31,16 @@
 				var sp1 = document.getElementById('userID');
 				sp1.textContent = userID;
 				
+
 				//url dove va ad ascoltare l'evento SseEmitter
 				console.log("SUBSCRIBE");
 				const url = '/maven-spring-mvc-sse/subscribe?userID=' + userID;
 				//creo un evento per iscriversi al Sse
-				const eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
+				var eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
 				console.log(eventSource);
-				
+
 				//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
+				
 				eventSource.addEventListener("latestNews", (event) => {
 				    console.log("Ricevuto evento", event);
 				    const articleData = JSON.parse(event.data);
@@ -51,7 +53,7 @@
 				    el.appendChild(document.createElement('br'));
 				    el.appendChild(document.createElement('br'));
 				});
-				
+
 				//eventSource.onerror = (event) => {
 				eventSource.addEventListener("error", (event) => {
 					console.log("Error occured: ", event);
@@ -68,6 +70,7 @@
 					}
 					event.target.close();
 				});
+
 				
 				// puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
 				
@@ -82,11 +85,12 @@
 				// addEventListener version
 				window.addEventListener('online', (event) => {
 				    console.log("You are now connected to the network.");
-/* 				    console.log("event: ",event);
+				    console.log("event: ",event);
+				    console.log("eventSource: ", eventSource);
 					if (eventSource.readyState == EventSource.CLOSED) {
-					    const eventSource = new EventSource(url); 
-						console.log('ricreata nuova connessione eventSource');
-					} */
+					    //var eventSource = new EventSource(url); 
+						//console.log('ricreata nuova connessione eventSource');
+					}
 				});
 
         </script>
