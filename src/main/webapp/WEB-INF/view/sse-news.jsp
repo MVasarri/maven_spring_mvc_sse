@@ -78,7 +78,7 @@
 				window.addEventListener("beforeunload", function(event) { 
 					    console.log("on before unload");
 					    eventSource.close();
-					    fetch( '/unsubscribe?userID=' + userID );
+					    fetch( '/maven-spring-mvc-sse/unsubscribe?userID=' + userID );
 						console.log('unsubscribe lanciata');
 				});
 				
