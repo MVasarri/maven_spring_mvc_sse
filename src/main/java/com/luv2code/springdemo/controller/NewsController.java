@@ -49,6 +49,8 @@ public class NewsController {
         emitters.put(userID, sseEmitter);
 
         sendinitEvent(userID, sseEmitter);
+        logger.info("inizializzazione eseguita con successo del subscriber: {}", userID);
+
 
         //sseEmitter.complete();
 
@@ -108,13 +110,13 @@ public class NewsController {
 
 	@PostMapping(value = "/dispatchEventToSpecificUser")
     public void dispatchEventToSpecificUser(@RequestParam String title, @RequestParam String text, @RequestParam String userID) {
-        logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' che ricevo dalla post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
+        logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews', ricevo tramite una post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
 
         //trasformo le stringhe title & text in formato JSON
         String eventFormatted = new JSONObject()
                 .put("title", title)
                 .put("text", text).toString();
-        logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews' che ricevo dalla post dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
+        logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews',dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
 
         SseEmitter sseEmitter = emitters.get(userID);
         if (sseEmitter != null) {
@@ -136,11 +138,11 @@ public class NewsController {
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEvent2", consumes = "application/json")
     public void dispatchEvent2ToClients(@RequestBody ArticleModel article) throws Exception {
-        logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierï¿½ all'evento 'latestNews' nel formato JSON che ricevo dalla post dopo che ï¿½ stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
+        logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
 
         ObjectMapper mapper = new ObjectMapper();
         String message = mapper.writeValueAsString(article);
-        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierï¿½ all'evento 'latestNews' dopo aver riconvertito l'articolo da oggetto a stringa da Jeckson\n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
+        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierà all'evento 'latestNews', dopo aver riconvertito l'articolo, da oggetto a stringa tramite Jeckson\n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
         
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
@@ -182,9 +184,9 @@ public class NewsController {
         try {
             //invia un evento di inizializzazione ai client
             sseEmitter.send(SseEmitter.event().name("INIT"));
-            logger.info("inizializzazione eseguita con successo");
+            logger.info("inizializzazione eseguita con successo del subscriber: {}", userID);
         } catch (IOException e) {
-            logger.error("si ï¿½ verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
+            logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
             emitters.remove(userID);
         }
     }

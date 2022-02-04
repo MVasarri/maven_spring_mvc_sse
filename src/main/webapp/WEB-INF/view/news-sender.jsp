@@ -100,7 +100,7 @@
 				         console.log("inviato: " + this.status)
 				     }
 				 }
-				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed 	\xE8 è gestita  con il metodo application/x-www-form-urlencoded");
+				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed è gestita con il metodo application/x-www-form-urlencoded");
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  
