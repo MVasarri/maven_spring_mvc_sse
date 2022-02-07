@@ -35,6 +35,12 @@
 								   class="add-button"
 							/>
 						</div>
+						<div>
+							<input type="button" value="sendJSON_ByID"
+								   onclick= "sendJSON_ByID()"; return false;"
+								   class="add-button"
+							/>
+						</div>
 	
 				</form> 
 			</div>
@@ -62,6 +68,27 @@
 				};		
 				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
 			}   
+  			 
+  			 function  sendJSON_ByID() {
+				 var userID = document.getElementById("lid").value;
+		 		 var title = document.getElementById("ltitle").value;
+		 		 var text = document.getElementById("ltext").value;
+   				 if (title ==='' && text ===''){
+   					title = "JSON News All sub - Default";
+   					text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
+   				 }
+				console.log(title);
+				console.log(text);
+				const data = { title, text, userID};
+				const options = {
+						method : 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(data)
+				};		
+				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
+			} 
 
 			 
    			 function sendNewsAll(){
@@ -95,7 +122,7 @@
 				 var text = document.getElementById("ltext").value;
    				 if (title =='' && text ==''){
    					title = "News Id - Default";
-   					text = "Notizia di Default che arrivera ad uno specifico utente";
+   					text = "Notizia di Default che arrivera ad uno specifico utente gestita con il Content-Type: application/x-www-form-urlencoded";
    				 }
 				console.log(subID);
 				console.log(title);

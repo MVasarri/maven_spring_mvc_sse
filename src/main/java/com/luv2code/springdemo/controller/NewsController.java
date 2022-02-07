@@ -138,7 +138,7 @@ public class NewsController {
 
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEvent2", consumes = "application/json")
-    public void dispatchEvent2ToClients(@RequestBody ArticleModel article) throws Exception {
+    public void dispatchEvent2(@RequestBody ArticleModel article) throws Exception {
     	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
 
         ObjectMapper mapper = new ObjectMapper();
@@ -164,6 +164,32 @@ public class NewsController {
         //lacio una funzione che cancella elementi da una lista che indica gli eventi da cancellarte
         if(!emittersToBeDeleted.isEmpty()) {
             delateEmitter(emittersToBeDeleted);
+        }
+    }
+    
+    // method for dispatching events to all clients
+    @PostMapping(value = "/dispatchEvent2ToSpecificUser", consumes = "application/json")
+    public void dispatchEvent2ToSpecificUser(@RequestBody ArticleModel article) throws Exception {
+    	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String message = mapper.writeValueAsString(article);
+        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierà all'evento 'latestNews', dopo aver riconvertito l'articolo, da oggetto a stringa tramite Jeckson\n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
+        
+        SseEmitter sseEmitter = emitters.get(article.getUserID());
+        if (sseEmitter != null) {
+            try {
+                sseEmitter.send(SseEmitter.event().name("latestNews").data(message));
+                logger.debug("evento Send ById inviato");
+            } catch (IOException e) {
+                logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
+                //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
+                emitters.remove(article.getUserID());
+                logger.error("emitters dopo: {}", emitters);
+            }
+        }else {
+            logger.error("\n	il messaggio non è stato inviato perchè l'id non è presente");
+
         }
     }
     
