@@ -8,87 +8,71 @@
 </head>
 <body>
 			<h1>Invia News</h1>	
-			<input type="text" id="myInPutID" value=""
-				   class="add-text"
-			/>		
+			<div>	
+				<form >
+					  <label for="ltitle">Titolo Articolo:</label><br>
+					  <input type="text" id="ltitle" name="ltitle" value=""><br>
+					  <label for="ltext">Testo Articolo:</label><br>
+					  <input type="text" id="ltext" name="ltext" value=""><br><br>
+					  <label for="lid">Id Destinatario:</label><br>
+					  <input type="text" id="lid" name="lid" value=""><br>
+					  <div>
+	  					  <input type="button" value="sendNewsAll"
+										   onclick= "sendNewsAll()"; return false;"
+										   class="add-button"
+						  />
+					  </div>
 
-			<input type="button" value="sendNewsAll"
-				   onclick= "sendNewsAll()"; return false;"
-				   class="add-button"
-			/>
-			
-			<input type="button" value="sendNewsByID"
-				   onclick= "sendNewsByID()"; return false;"
-				   class="add-button"
-			/>
-			
-			<input type="button" value="sendJSON_All"
-				   onclick= "sendJSON_All()"; return false;"
-				   class="add-button"
-			/>
-			
-		
-		
-<!-- 		<form:form action="dispatchEvent" modelAttribute="address" method="POST">
-					<label>num:</label>
-					<input type="text" value="name" class="save" param/>
+						<div>							
+							<input type="button" value="sendNewsByID"
+								   onclick= "sendNewsByID()"; return false;"
+								   class="add-button"
+							/>
+						</div>
+						<div>
+							<input type="button" value="sendJSON_All"
+								   onclick= "sendJSON_All()"; return false;"
+								   class="add-button"
+							/>
+						</div>
+	
+				</form> 
+			</div>
 
-					<label></label>
-					<input type="submit" value="Save" class="save" />
-			</form:form> -->
 			
 		<script type="text/javascript">
 
   			 function  sendJSON_All() {
-				var title = 'JSON News All sub';
-				var text =	'Questa notizia è gestita mediante l\' invio di un messaggio di tipo JSON';
-				const data = { title, text};
+		 		 var title = document.getElementById("ltitle").value;
+		 		 var text = document.getElementById("ltext").value;
+   				 if (title ==='' && text ===''){
+   					title = "JSON News All sub - Default";
+   					text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
+   				 }
+  				var userID = 'Destinataro/i: All';
+				console.log(title);
+				console.log(text);
+				const data = { title, text, userID};
 				const options = {
 						method : 'POST',
 						headers: {
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify(data)
-				};
-				
+				};		
 				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
 			}   
-			 		 
-/*  			 function sendJSON(){		
-				 	
-				 	const title = "messaggio 1";
-				 	const text =  "vediamo de questo messaggio va";
-				 
-		            // Creating a XHR object
-		            var xhr = new XMLHttpRequest();
-		            var url = '/maven-spring-mvc-sse/dispatchEvent2';
-		       
-		            // open a connection
-		            xhr.open("POST", url, true);
-		 
-		            // Set the request header i.e. which type of content you are sending
-		            xhr.setRequestHeader("Content-Type", "application/json");
-		 
-		            // Create a state change callback
-		            xhr.onreadystatechange = function () {
-		                if (xhr.readyState === 4 && xhr.status === 200) {
-		                    // Print received data from server
-		                    //result.innerHTML = this.responseText;
-		                    console.log("inviato: " + this.status)
-		                    console.log(xhr.responseText);
-		                }
-		            };
-		 
-		            // Converting JSON data to string
-		            var data = { "title": "messaggio 1", "text": "vediamo de questo messaggio va" };
-		 
-		            // Sending data with the request
-		            xhr.send(JSON.stringify(data));
-		            //xhr.send(data);
-		        }  */
+
 			 
    			 function sendNewsAll(){
-
+		 		 var title = document.getElementById("ltitle").value;
+				 var text = document.getElementById("ltext").value;
+   				 if (title ==='' && text ===''){
+   					title = "News AllSub tipo 1- Default";
+   					text = "Notizia di default è gestita con il Content-Type: application/x-www-form-urlencoded";
+   				 }
+				console.log(title);
+				console.log(text);
 				 var xhr = new XMLHttpRequest();
 				 xhr.open("POST", '/maven-spring-mvc-sse/dispatchEvent', true);
 	
@@ -100,15 +84,22 @@
 				         console.log("inviato: " + this.status)
 				     }
 				 }
-				 xhr.send("title=x-www-form-urlencoded News All sub&text=questa notizia arriva a tutti ed è gestita con il metodo application/x-www-form-urlencoded");
+				 xhr.send("title=" + title + "&text=" + text);
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  
 		     
    			 function sendNewsByID(){
-				 /* const subID = 21 */
-				 const subID = document.getElementById("myInPutID").value;
-				 console.log(subID);
+				 var subID = document.getElementById("lid").value;
+		 		 var title = document.getElementById("ltitle").value;
+				 var text = document.getElementById("ltext").value;
+   				 if (title =='' && text ==''){
+   					title = "News Id - Default";
+   					text = "Notizia di Default che arrivera ad uno specifico utente";
+   				 }
+				console.log(subID);
+				console.log(title);
+				console.log(text);
 				 var xhr = new XMLHttpRequest();
 				 xhr.open("POST", '/maven-spring-mvc-sse/dispatchEventToSpecificUser', true);
 	
@@ -120,13 +111,11 @@
 				         console.log("inviato: " + this.status)
 				     }
 				 }
-				 xhr.send("title=News dedicata&text=Questa notizia arriva solo a chi ha l'ID: " + subID + "&userID="+ subID);
+				 xhr.send("title=" + title + "&text=" + text + "&userID="+ subID);
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  
 			 
-			 
-		 
 		</script>
 		
 		

@@ -3,6 +3,8 @@
 public class ArticleModel {
 	private String title;
     private String text;
+    private String userID;
+    
     
 	public ArticleModel() {
 
@@ -11,6 +13,7 @@ public class ArticleModel {
 	public String getTitle() {
 		return title;
 	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -21,5 +24,14 @@ public class ArticleModel {
 		this.text = text;
 	}
 
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
+	
+	
 
 }

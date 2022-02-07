@@ -96,12 +96,15 @@
 							    el.appendChild(document.createElement('br'));
 							    el.appendChild(document.createTextNode(articleData.text));
 							    el.appendChild(document.createElement('br'));
+							    el.appendChild(document.createTextNode(articleData.userID));
+							    el.appendChild(document.createElement('br'));
 							    el.appendChild(document.createElement('br'));
 							});
 		
 							//eventSource.onerror = (event) => {
 							eventSource.addEventListener("error", (event) => {
-								  eventSource.close();
+								console.log("Error occured: ", event);  
+								eventSource.close();
 							      reconnectFunc();
 /* 									staCon(eventSource.readyState);
 									console.log("Error occured: ", event);

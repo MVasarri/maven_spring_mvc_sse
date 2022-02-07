@@ -42,8 +42,8 @@ public class NewsController {
     @RequestMapping(value = "/subscribe", consumes = MediaType.ALL_VALUE)
     public SseEmitter subscribe(@RequestParam String userID) {
 
-        //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma puï¿½ essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
-        //Long.MAX_VALUE (long) 100000
+        //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
+        //Long.MAX_VALUE, (long) 100000,   10_000L
     	SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
     	
         emitters.put(userID, sseEmitter);
@@ -56,8 +56,7 @@ public class NewsController {
 
         logger.debug("stampa l'oggetto Sse' \n {}", sseEmitter);
         logger.debug("stampa la lista di Sse' \n {}", emitters);
-        //memorizzo l'emettitore, che ï¿½ solo un riferimento all'oggetto che mantiente la connessione con i client in modo che passiamo, in modo che possiamo usarlo in seguito e inviare altri eventi ai miei client
-        //emitters.add(sseEmitter);
+
         
         //l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino all'arrivo di una richiesta di ciusura da parte del client
         sseEmitter.onCompletion(() -> {
@@ -67,9 +66,9 @@ public class NewsController {
 
         sseEmitter.onTimeout(() -> {
             emitters.remove(userID);
-            logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onTimeout' \n {}", emitters);
+            logger.debug("subscribers ancora Vivi dopo il Timeout' \n {}", emitters);
         });
-        sseEmitter.onError((e) -> {
+        sseEmitter.onError((e) -> {        	
             emitters.remove(userID);
             logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onError' \n {}", emitters);
         });
@@ -81,11 +80,12 @@ public class NewsController {
     @PostMapping(value = "/dispatchEvent")
     public void dispatchEventToClients(@RequestParam String title, @RequestParam String text) {
         logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' che ricevo dalla post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
-
+        String txtDestination = "Destinataro/i: All";
         //trasformo le stringhe title & text in formato JSON
         String eventFormatted = new JSONObject()
                 .put("title", title)
-                .put("text", text).toString();
+                .put("text", text)
+                .put("userID", txtDestination).toString();
         logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews' che ricevo dalla post dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
         //dichiarazione e creazione della lista di id di elementi da cancellare
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
@@ -111,11 +111,12 @@ public class NewsController {
 	@PostMapping(value = "/dispatchEventToSpecificUser")
     public void dispatchEventToSpecificUser(@RequestParam String title, @RequestParam String text, @RequestParam String userID) {
         logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews', ricevo tramite una post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
-
+        String txtDestination = "Destinataro/i: "+ userID;
         //trasformo le stringhe title & text in formato JSON
         String eventFormatted = new JSONObject()
                 .put("title", title)
-                .put("text", text).toString();
+                .put("text", text)
+                .put("userID", txtDestination).toString();
         logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews',dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
 
         SseEmitter sseEmitter = emitters.get(userID);
@@ -125,7 +126,7 @@ public class NewsController {
                 logger.debug("evento Send ById inviato");
             } catch (IOException e) {
                 logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
-                //qui uso la rimozione, perchï¿½ non sono in grado di rilevare quando il client non ï¿½ piï¿½ connesso al mio emettitore
+                //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
                 emitters.remove(userID);
                 logger.error("emitters dopo: {}", emitters);
             }
@@ -138,7 +139,7 @@ public class NewsController {
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEvent2", consumes = "application/json")
     public void dispatchEvent2ToClients(@RequestBody ArticleModel article) throws Exception {
-        logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
+    	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
 
         ObjectMapper mapper = new ObjectMapper();
         String message = mapper.writeValueAsString(article);
@@ -151,7 +152,7 @@ public class NewsController {
             try {
                 System.out.println("hello " + message);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
-                //To do Analizzare questo elenco per verifichare chi ï¿½ tra questi ancora aperto e togliere chi non ï¿½ piï¿½ in ascolto
+                //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
                 emitter.send(SseEmitter.event().name("latestNews").data(message));
                 logger.debug("evento Send All inviato");
             } catch (IOException e) {
@@ -194,7 +195,7 @@ public class NewsController {
     private void delateEmitter(List<String> emittersToBeDeleted) {
     	logger.info("emitters prima della cancellazione: {}", emitters);
     	for (String id : emittersToBeDeleted) {
-            //qui uso la rimozione, perchï¿½ non sono in grado di rilevare quando il client non ï¿½ piï¿½ connesso al mio emettitore
+            //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
             emitters.remove(id);
         }
     	logger.info("emitters dopo della cancellazione: {}", emitters);
