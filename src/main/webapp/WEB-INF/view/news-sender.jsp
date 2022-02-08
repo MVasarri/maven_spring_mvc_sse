@@ -18,26 +18,26 @@
 					  <input type="text" id="lid" name="lid" value=""><br>
 					  <div>
 	  					  <input type="button" value="sendNewsAll"
-										   onclick= "sendNewsAll()"; return false;"
+										   onclick= "sendNewsAll()"
 										   class="add-button"
 						  />
 					  </div>
 
 						<div>							
 							<input type="button" value="sendNewsByID"
-								   onclick= "sendNewsByID()"; return false;"
+								   onclick= "sendNewsByID()"
 								   class="add-button"
 							/>
 						</div>
 						<div>
 							<input type="button" value="sendJSON_All"
-								   onclick= "sendJSON_All()"; return false;"
+								   onclick= "sendJSON_All()"
 								   class="add-button"
 							/>
 						</div>
 						<div>
 							<input type="button" value="sendJSON_ByID"
-								   onclick= "sendJSON_ByID()"; return false;"
+								   onclick= "sendJSON_ByID()"
 								   class="add-button"
 							/>
 						</div>
