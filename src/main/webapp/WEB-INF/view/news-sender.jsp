@@ -21,6 +21,10 @@
 										   onclick= "sendNewsAll()"
 										   class="add-button"
 						  />
+  	  					  <input type="button" value="send100NewsAll"
+										   onclick= "send100NewsAll()"
+										   class="add-button"
+						  />
 					  </div>
 
 						<div>							
@@ -28,18 +32,30 @@
 								   onclick= "sendNewsByID()"
 								   class="add-button"
 							/>
+							<input type="button" value="send100NewsByID"
+								   onclick= "send100NewsByID()"
+								   class="add-button"
+							/>							
 						</div>
 						<div>
 							<input type="button" value="sendJSON_All"
 								   onclick= "sendJSON_All()"
 								   class="add-button"
 							/>
+							<input type="button" value="send100JSON_All"
+								   onclick= "send100JSON_All()"
+								   class="add-button"
+							/>							
 						</div>
 						<div>
 							<input type="button" value="sendJSON_ByID"
 								   onclick= "sendJSON_ByID()"
 								   class="add-button"
 							/>
+							<input type="button" value="send100JSON_ByID"
+								   onclick= "send100JSON_ByID()"
+								   class="add-button"
+							/>							
 						</div>
 	
 				</form> 
@@ -142,6 +158,27 @@
 				 // xhr.send(new Int8Array());
 				 // xhr.send(document);
 			 }  
+   			 
+   			function  send100JSON_All() {
+   				for (let i = 0; i < 100; i++) {
+   					sendJSON_All();
+   				}; 				
+   			}
+   			function  send100JSON_ByID() {
+   				for (let i = 0; i < 100; i++) {
+   					sendJSON_ByID();
+   				};
+   			}
+   			function send100NewsAll(){
+   				for (let i = 0; i < 100; i++) {
+   					sendNewsAll();
+   				};
+   			}
+   			function send100NewsByID(){
+   				for (let i = 0; i < 100; i++) {
+   					sendNewsByID();
+   				};
+   			}
 			 
 		</script>
 		
