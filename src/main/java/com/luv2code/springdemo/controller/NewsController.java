@@ -99,18 +99,19 @@ public class NewsController {
         //dichiarazione e creazione della lista di id di elementi da cancellare
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         
-        logger.debug("\n	Invoking an asynchronous method. {}", Thread.currentThread().getName());
-        final Future<String> future = asyncMessageSseEComponent.asyncMethodWithReturnType();
-        while (true) {
-            if (future.isDone()) {
-                System.out.println("Result from asynchronous process - " + future.get());
-                break;
-            }
-            System.out.println("Continue doing something else. ");
-            Thread.sleep(1000);
-        }
-        
         for (String id : emitters.keySet()) {
+            
+        	logger.debug("\n	Invoking an asynchronous method. {}", Thread.currentThread().getName());
+            final Future<String> future = asyncMessageSseEComponent.asyncMethodWithReturnType();
+            while (true) {
+                if (future.isDone()) {
+                    logger.debug(" Result from asynchronous process - {}",future.get());
+                    break;
+                }
+                logger.debug("Continue doing something else. ");
+                Thread.sleep(1000);
+            }
+        	
             SseEmitter emitter= emitters.get(id);
         	try {
                 emitter.send(SseEmitter.event().name("latestNews").data(eventFormatted));
