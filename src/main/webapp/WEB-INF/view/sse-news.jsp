@@ -22,10 +22,18 @@
         </div>
 
         <div class="grid-container">
-            <div id="sseNews1"></div> 
+            <div id="sseNews1">
+            	<h6 id="ttlNews"></h6>
+            	<p id="txtNews"></p>
+            	<p id="idNews"></p>
+            	<p id="nNews"></p>
+            	
+            
+            </div> 
         </div>
 
         <script type="text/javascript">
+        		var nNews = 0;
 
 				var userID = Math.floor((Math.random() * 1000) + 1);
 				var sp1 = document.getElementById('userID');
@@ -86,19 +94,25 @@
 							
 							//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
 							eventSource.addEventListener("latestNews", (event) => {
-							    console.log("Ricevuto evento", event);
+							    nNews = nNews +1;
+								console.log("Ricevuto evento", event);
 							    staCon(eventSource.readyState);
 							    const articleData = JSON.parse(event.data);
 							    //const articleData = event.data;
 							    console.log(articleData);
-							    var el = document.getElementById('sseNews1');
+							    var el = document.getElementById('ttlNews').innerHTML = articleData.title;
+							    var el = document.getElementById('txtNews').innerHTML = articleData.text;							    
+							    var el = document.getElementById('idNews').innerHTML = articleData.userID;
+							    var el = document.getElementById('nNews').innerHTML = nNews;
+							    
+/* 							    var el = document.getElementById('sseNews1');
 							    el.appendChild(document.createTextNode(articleData.title));
 							    el.appendChild(document.createElement('br'));
 							    el.appendChild(document.createTextNode(articleData.text));
 							    el.appendChild(document.createElement('br'));
 							    el.appendChild(document.createTextNode(articleData.userID));
 							    el.appendChild(document.createElement('br'));
-							    el.appendChild(document.createElement('br'));
+							    el.appendChild(document.createElement('br')); */
 							});
 		
 							//eventSource.onerror = (event) => {
