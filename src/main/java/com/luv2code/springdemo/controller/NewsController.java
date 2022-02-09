@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.luv2code.springdemo.component.AsyncMessageSseEComponent;
 import com.luv2code.springdemo.dataTransfert.ArticleModel;
+import com.luv2code.springdemo.service.AddressService;
 
 @RestController
 public class NewsController {
+	
+	// need to inject our address service
+	@Autowired
+	private  AsyncMessageSseEComponent asyncMessageSseEComponent;
 
     private static final Logger logger
             = LoggerFactory.getLogger(HomeController.class);
@@ -78,7 +87,7 @@ public class NewsController {
 
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEvent")
-    public void dispatchEventToClients(@RequestParam String title, @RequestParam String text) {
+    public void dispatchEventToClients(@RequestParam String title, @RequestParam String text) throws InterruptedException, ExecutionException {
         logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' che ricevo dalla post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
         String txtDestination = "Destinataro/i: All";
         //trasformo le stringhe title & text in formato JSON
@@ -89,6 +98,18 @@ public class NewsController {
         logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews' che ricevo dalla post dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
         //dichiarazione e creazione della lista di id di elementi da cancellare
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
+        
+        logger.debug("\n	Invoking an asynchronous method. {}", Thread.currentThread().getName());
+        final Future<String> future = asyncMessageSseEComponent.asyncMethodWithReturnType();
+        while (true) {
+            if (future.isDone()) {
+                System.out.println("Result from asynchronous process - " + future.get());
+                break;
+            }
+            System.out.println("Continue doing something else. ");
+            Thread.sleep(1000);
+        }
+        
         for (String id : emitters.keySet()) {
             SseEmitter emitter= emitters.get(id);
         	try {
