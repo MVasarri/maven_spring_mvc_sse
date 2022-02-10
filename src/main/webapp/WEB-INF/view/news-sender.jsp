@@ -64,7 +64,8 @@
 			
 		<script type="text/javascript">
 
-  			 function  sendJSON_All() {
+		//	async function  sendJSON_All() {
+			function  sendJSON_All() {
 		 		 var title = document.getElementById("ltitle").value;
 		 		 var text = document.getElementById("ltext").value;
    				 if (title ==='' && text ===''){
@@ -81,11 +82,15 @@
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify(data)
-				};		
+				};	
 				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
-			}   
+
+/* 				const response = await fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
+				console.log("stampa qualcosa? " + await responce.status); */
+  			 }   
   			 
-  			 function  sendJSON_ByID() {
+  			// async function  sendJSON_ByID() {
+  			function  sendJSON_ByID() {
 				 var userID = document.getElementById("lid").value;
 		 		 var title = document.getElementById("ltitle").value;
 		 		 var text = document.getElementById("ltext").value;
@@ -93,17 +98,18 @@
    					title = "JSON News All sub - Default";
    					text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
    				 }
-				console.log(title);
-				console.log(text);
 				const data = { title, text, userID};
+				console.log("data:\n" + data);
 				const options = {
 						method : 'POST',
 						headers: {
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify(data)
-				};		
-				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
+				};	
+				var response = fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
+/* 				var response = await fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
+				console.log("stampa qualcosa? " + await responce.status); */
 			} 
 
 			 
