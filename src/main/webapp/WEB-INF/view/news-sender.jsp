@@ -167,24 +167,66 @@
    			 
    			function  send100JSON_All() {
    				for (let i = 0; i < 100; i++) {
+   					delay(1000);
    					sendJSON_All();
    				}; 				
    			}
    			function  send100JSON_ByID() {
    				for (let i = 0; i < 100; i++) {
+   					delay(1000);
    					sendJSON_ByID();
    				};
    			}
    			function send100NewsAll(){
    				for (let i = 0; i < 100; i++) {
+   					delay(1000);
    					sendNewsAll();
    				};
    			}
    			function send100NewsByID(){
    				for (let i = 0; i < 100; i++) {
+   					delay(1000);
    					sendNewsByID();
    				};
    			}
+   			
+   			
+   			
+/*		 
+		function sendJSON(){		
+		 	
+		 	const title = "messaggio 1";
+		 	const text =  "vediamo de questo messaggio va";
+		 
+            // Creating a XHR object
+            var xhr = new XMLHttpRequest();
+            var url = '/maven-spring-mvc-sse/dispatchEvent2';
+       
+            // open a connection
+            xhr.open("POST", url, true);
+ 
+            // Set the request header i.e. which type of content you are sending
+            xhr.setRequestHeader("Content-Type", "application/json");
+ 
+            // Create a state change callback
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Print received data from server
+                    //result.innerHTML = this.responseText;
+                    console.log("inviato: " + this.status)
+                    console.log(xhr.responseText);
+                }
+            };
+ 
+            // Converting JSON data to string
+            var data = { "title": "messaggio 1", "text": "vediamo de questo messaggio va" };
+ 
+            // Sending data with the request
+            xhr.send(JSON.stringify(data));
+            //xhr.send(data);
+        }  
+*/
+   			
 			 
 		</script>
 		
