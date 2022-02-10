@@ -107,7 +107,7 @@
 						},
 						body: JSON.stringify(data)
 				};	
-				var response = fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
+				fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options).then(function(response) {console.log(response.status);});
 /* 				var response = await fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
 				console.log("stampa qualcosa? " + await responce.status); */
 			} 
