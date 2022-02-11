@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.luv2code.springdemo.dataTransfert.ArticleModel;
 
 public interface MessageService {
-    public SseEmitter subscribe(String userID);  
+    public SseEmitter subscribe(String userID, Integer nNews);  
     
     public void dispatchEventToClients(String title,  String text)throws InterruptedException, ExecutionException;
     public void dispatchEventToSpecificUser(String title, String text, String userID);

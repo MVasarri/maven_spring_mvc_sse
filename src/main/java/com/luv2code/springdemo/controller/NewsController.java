@@ -40,8 +40,8 @@ public class NewsController {
     //nell'annotazione @RequestMapping.   
 	@CrossOrigin
 	@RequestMapping(value = "/subscribe", consumes = MediaType.ALL_VALUE)
-	public SseEmitter subscribe(@RequestParam String userID) {
-	     return messageService.subscribe(userID);
+	public SseEmitter subscribe(@RequestParam String userID, @RequestParam Integer nNews) {
+	     return messageService.subscribe(userID, nNews);
 	} 
     
     

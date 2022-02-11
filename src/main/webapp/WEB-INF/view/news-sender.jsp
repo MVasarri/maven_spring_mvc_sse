@@ -165,28 +165,29 @@
 				 // xhr.send(document);
 			 }  
    			 
-   			function  send100JSON_All() {
+   		function sleep(ms) {
+   			  return new Promise(resolve => setTimeout(resolve, ms));
+   			}
+   			
+   		async function  send100JSON_All() {
    				for (let i = 0; i < 100; i++) {
-   					delay(1000);
-   					sendJSON_All();
+   					await setTimeout(() => { sendJSON_All(); }, 2000);
+   					//sleep(2000).then(sendJSON_All());
    				}; 				
    			}
-   			function  send100JSON_ByID() {
+   		async function  send100JSON_ByID() {
    				for (let i = 0; i < 100; i++) {
-   					delay(1000);
-   					sendJSON_ByID();
+   					sleep(2000).then(sendJSON_ByID());
    				};
    			}
-   			function send100NewsAll(){
+   		async function send100NewsAll(){
    				for (let i = 0; i < 100; i++) {
-   					delay(1000);
-   					sendNewsAll();
+   					sleep(2000).then(sendNewsAll());
    				};
    			}
    			function send100NewsByID(){
    				for (let i = 0; i < 100; i++) {
-   					delay(1000);
-   					sendNewsByID();
+   					sleep(2000).then(sendNewsByID()); 					
    				};
    			}
    			

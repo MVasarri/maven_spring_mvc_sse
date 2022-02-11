@@ -27,6 +27,7 @@
             	<p id="txtNews"></p>
             	<p id="idNews"></p>
             	<p id="nNews"></p>
+            	<p id="mLost"></p>
             	
             
             </div> 
@@ -39,7 +40,7 @@
 				var sp1 = document.getElementById('userID');
 				sp1.textContent = userID;
 				//url dove va ad ascoltare l'evento SseEmitter
-				var url = '/maven-spring-mvc-sse/subscribe?userID=' + userID;
+				var url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nNews=' + nNews;
 
 				var eventSource;
 				
@@ -99,12 +100,17 @@
 							    staCon(eventSource.readyState);
 							    const articleData = JSON.parse(event.data);
 							    //const articleData = event.data;
+								console.log("ultimo id evento ricevuto", event.lastEventId);
+							    
 							    console.log(articleData);
 							    var el = document.getElementById('ttlNews').innerHTML = articleData.title;
 							    var el = document.getElementById('txtNews').innerHTML = articleData.text;							    
 							    var el = document.getElementById('idNews').innerHTML = articleData.userID;
-							    var el = document.getElementById('nNews').innerHTML = nNews;
-							    
+							    var el = document.getElementById('nNews').innerHTML = "Sono stati inviati "+ nNews+ " messaggi";
+							    if(parseInt(event.lastEventId) > nNews){
+							    	var mLost = (parseInt(event.lastEventId) - nNews);
+							    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
+							    }
 /* 							    var el = document.getElementById('sseNews1');
 							    el.appendChild(document.createTextNode(articleData.title));
 							    el.appendChild(document.createElement('br'));
