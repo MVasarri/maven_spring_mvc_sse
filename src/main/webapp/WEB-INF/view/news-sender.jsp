@@ -171,23 +171,22 @@
    			
    		async function  send100JSON_All() {
    				for (let i = 0; i < 100; i++) {
-   					await setTimeout(() => { sendJSON_All(); }, 2000);
-   					//sleep(2000).then(sendJSON_All());
+   					await sleep(2000).then(sendJSON_All());
    				}; 				
    			}
    		async function  send100JSON_ByID() {
    				for (let i = 0; i < 100; i++) {
-   					sleep(2000).then(sendJSON_ByID());
+   					await sleep(2000).then(sendJSON_ByID());
    				};
    			}
    		async function send100NewsAll(){
    				for (let i = 0; i < 100; i++) {
-   					sleep(2000).then(sendNewsAll());
+   					await sleep(2000).then(sendNewsAll());
    				};
    			}
-   			function send100NewsByID(){
+   		async function send100NewsByID(){
    				for (let i = 0; i < 100; i++) {
-   					sleep(2000).then(sendNewsByID()); 					
+   					await sleep(2000).then(sendNewsByID()); 					
    				};
    			}
    			
