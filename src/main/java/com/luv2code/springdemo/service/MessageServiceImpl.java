@@ -144,7 +144,7 @@ public class MessageServiceImpl implements MessageService {
     }
     
 	@Override
-    public void /*String*/ dispatchEvent2(@RequestBody ArticleModel article) throws Exception {
+    public void /*String*/ dispatchEventJSON(@RequestBody ArticleModel article) throws Exception {
     	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
 
         ObjectMapper mapper = new ObjectMapper();
@@ -176,7 +176,7 @@ public class MessageServiceImpl implements MessageService {
     }
     
 	@Override
-    public void dispatchEvent2ToSpecificUser(@RequestBody ArticleModel article) throws Exception {
+    public void dispatchEventJSONToSpecificUser(@RequestBody ArticleModel article) throws Exception {
     	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
 
         ObjectMapper mapper = new ObjectMapper();

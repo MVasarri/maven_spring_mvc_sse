@@ -51,6 +51,12 @@ public class NewsController {
         messageService.dispatchEventToClients(title, text);
     }
     
+    // method for dispatching events to all clients
+    @PostMapping(value = "/dispatch100Event")
+    public void dispatch100EventToClients(@RequestParam String title, @RequestParam String text) throws InterruptedException, ExecutionException {
+    	asyncMessageSseEComponent.async100mesWWW(title, text);
+    }
+    
     
     // method for dispatching events to a Specific User
 	@PostMapping(value = "/dispatchEventToSpecificUser")
@@ -60,16 +66,21 @@ public class NewsController {
 
 	
     // method for dispatching events to all clients
-    @PostMapping(value = "/dispatchEvent2", consumes = "application/json")
-    public void /*String*/ dispatchEvent2(@RequestBody ArticleModel article) throws Exception {
-    	messageService.dispatchEvent2(article);
+    @PostMapping(value = "/dispatchEventJSON", consumes = "application/json")
+    public void /*String*/ dispatchEventJSON(@RequestBody ArticleModel article) throws Exception {
+    	messageService.dispatchEventJSON(article);
     }
     
+    // method for dispatching events to all clients
+    @PostMapping(value = "/dispatch100EventJSON", consumes = "application/json")
+    public void /*String*/ dispatch100EventJSON(@RequestBody ArticleModel article) throws Exception {
+    	asyncMessageSseEComponent.async100mesJSON(article);
+    }
  
     // method for dispatching events to all clients
-    @PostMapping(value = "/dispatchEvent2ToSpecificUser", consumes = "application/json")
-    public void dispatchEvent2ToSpecificUser(@RequestBody ArticleModel article) throws Exception {
-    	messageService.dispatchEvent2ToSpecificUser(article);
+    @PostMapping(value = "/dispatchEventJSONToSpecificUser", consumes = "application/json")
+    public void dispatchEventJSONToSpecificUser(@RequestBody ArticleModel article) throws Exception {
+    	messageService.dispatchEventJSONToSpecificUser(article);
     }
     
 

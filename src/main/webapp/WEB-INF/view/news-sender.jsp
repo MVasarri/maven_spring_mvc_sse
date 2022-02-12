@@ -25,6 +25,10 @@
 										   onclick= "send100NewsAll()"
 										   class="add-button"
 						  />
+   	  					  <input type="button" value="repNews100WWW"
+										   onclick= "sendNewsAll('dispatchEvent')"
+										   class="add-button"
+						  />
 					  </div>
 
 						<div>							
@@ -39,13 +43,17 @@
 						</div>
 						<div>
 							<input type="button" value="sendJSON_All"
-								   onclick= "sendJSON_All()"
+								   onclick= "sendJSON_All('dispatchEventJSON')"
 								   class="add-button"
 							/>
 							<input type="button" value="send100JSON_All"
 								   onclick= "send100JSON_All()"
 								   class="add-button"
-							/>							
+							/>	
+							<input type="button" value="repNews100JSON"
+								   onclick= "sendJSON_All('dispatch100EventJSON')"
+								   class="add-button"
+							/>						
 						</div>
 						<div>
 							<input type="button" value="sendJSON_ByID"
@@ -65,7 +73,7 @@
 		<script type="text/javascript">
 
 		//	async function  sendJSON_All() {
-			function  sendJSON_All() {
+			function  sendJSON_All(typeEv) {
 		 		 var title = document.getElementById("ltitle").value;
 		 		 var text = document.getElementById("ltext").value;
    				 if (title ==='' && text ===''){
@@ -83,7 +91,9 @@
 						},
 						body: JSON.stringify(data)
 				};	
-				const response = fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
+				var url = '/maven-spring-mvc-sse/' + typeEv;
+				//	'/maven-spring-mvc-sse/dispatchEventJSON'
+				const response = fetch(url, options);
 
 /* 				const response = await fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
 				console.log("stampa qualcosa? " + await responce.status); */
@@ -107,13 +117,13 @@
 						},
 						body: JSON.stringify(data)
 				};	
-				fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options).then(function(response) {console.log(response.status);});
+				fetch('/maven-spring-mvc-sse/dispatchEventJSONToSpecificUser', options).then(function(response) {console.log(response.status);});
 /* 				var response = await fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
 				console.log("stampa qualcosa? " + await responce.status); */
 			} 
 
 			 
-   			 function sendNewsAll(){
+   			 function sendNewsAll(typeEv){
 		 		 var title = document.getElementById("ltitle").value;
 				 var text = document.getElementById("ltext").value;
    				 if (title ==='' && text ===''){
@@ -123,7 +133,8 @@
 				console.log(title);
 				console.log(text);
 				 var xhr = new XMLHttpRequest();
-				 xhr.open("POST", '/maven-spring-mvc-sse/dispatchEvent', true);
+				 var url = '/maven-spring-mvc-sse/' + typeEv;
+				 xhr.open("POST", url, true);
 	
 				 //Send the proper header information along with the request
 				 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -171,22 +182,22 @@
    			
    		async function  send100JSON_All() {
    				for (let i = 0; i < 100; i++) {
-   					await sleep(2000).then(sendJSON_All());
+   					await sleep(800).then(sendJSON_All());
    				}; 				
    			}
    		async function  send100JSON_ByID() {
    				for (let i = 0; i < 100; i++) {
-   					await sleep(2000).then(sendJSON_ByID());
+   					await sleep(800).then(sendJSON_ByID());
    				};
    			}
    		async function send100NewsAll(){
    				for (let i = 0; i < 100; i++) {
-   					await sleep(2000).then(sendNewsAll());
+   					await sleep(800).then(sendNewsAll());
    				};
    			}
    		async function send100NewsByID(){
    				for (let i = 0; i < 100; i++) {
-   					await sleep(2000).then(sendNewsByID()); 					
+   					await sleep(800).then(sendNewsByID()); 					
    				};
    			}
    			
@@ -200,7 +211,7 @@
 		 
             // Creating a XHR object
             var xhr = new XMLHttpRequest();
-            var url = '/maven-spring-mvc-sse/dispatchEvent2';
+            var url = '/maven-spring-mvc-sse/dispatchEventJSON';
        
             // open a connection
             xhr.open("POST", url, true);

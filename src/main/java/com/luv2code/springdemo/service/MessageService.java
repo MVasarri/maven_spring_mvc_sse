@@ -15,8 +15,8 @@ public interface MessageService {
     public void dispatchEventToClients(String title,  String text)throws InterruptedException, ExecutionException;
     public void dispatchEventToSpecificUser(String title, String text, String userID);
     
-    public void /*String*/ dispatchEvent2(ArticleModel article) throws Exception;
-    public void dispatchEvent2ToSpecificUser(ArticleModel article) throws Exception;
+    public void /*String*/ dispatchEventJSON(ArticleModel article) throws Exception;
+    public void dispatchEventJSONToSpecificUser(ArticleModel article) throws Exception;
     
     public void unsubscribe(String userID);
     
