@@ -18,36 +18,36 @@
 					  <input type="text" id="lid" name="lid" value=""><br>
 					  <div>
 	  					  <input type="button" value="sendNewsAll"
-										   onclick= "sendNewsAll()"
+										   onclick= "sendNewsAll('dispatchEvent')"
 										   class="add-button"
 						  />
   	  					  <input type="button" value="send100NewsAll"
-										   onclick= "send100NewsAll()"
+										   onclick= "send100NewsAll('dispatchEvent')"
 										   class="add-button"
 						  />
-   	  					  <input type="button" value="repNews100WWW"
+   	  					  <input type="button" id="repNews100WWW" value="repNews100WWW"
 										   onclick= "sendNewsAll('dispatchEvent')"
 										   class="add-button"
 						  />
 					  </div>
 
 						<div>							
-							<input type="button" value="sendNewsByID"
+							<input type="button" id="btnWID" value="sendNewsByID"
 								   onclick= "sendNewsByID()"
-								   class="add-button"
+								   class="add-button" disabled
 							/>
-							<input type="button" value="send100NewsByID"
+							<input type="button" id="btnW100ID" value="send100NewsByID"
 								   onclick= "send100NewsByID()"
-								   class="add-button"
+								   class="add-button" disabled
 							/>							
 						</div>
 						<div>
 							<input type="button" value="sendJSON_All"
-								   onclick= "sendJSON_All('dispatchEventJSON')"
+								   onclick= "sendJSON_All('dispatch100EventJSON')"
 								   class="add-button"
 							/>
 							<input type="button" value="send100JSON_All"
-								   onclick= "send100JSON_All()"
+								   onclick= "send100JSON_All('dispatch100EventJSON')"
 								   class="add-button"
 							/>	
 							<input type="button" value="repNews100JSON"
@@ -56,13 +56,13 @@
 							/>						
 						</div>
 						<div>
-							<input type="button" value="sendJSON_ByID"
+							<input type="button" id="btnJSONid"value="sendJSON_ByID"
 								   onclick= "sendJSON_ByID()"
-								   class="add-button"
+								   class="add-button" disabled
 							/>
-							<input type="button" value="send100JSON_ByID"
+							<input type="button" id="btnJSON100id" value="send100JSON_ByID"
 								   onclick= "send100JSON_ByID()"
-								   class="add-button"
+								   class="add-button" disabled
 							/>							
 						</div>
 	
@@ -71,7 +71,17 @@
 
 			
 		<script type="text/javascript">
+/* 		const input = document.getElementById('lid');
+		input.addEventListener('lid', updateValue);	
+		function updateValue(e) {
+			  if(e.target.value != "" ){
+				  document.getElementById("btnWID").disabled = false;
+				  document.getElementById("btnW100ID").disabled = false;
+				  document.getElementById("btnJSONid").disabled = false;
+				  document.getElementById("btnJSON100id").disabled = false;
+			  } */
 
+		
 		//	async function  sendJSON_All() {
 			function  sendJSON_All(typeEv) {
 		 		 var title = document.getElementById("ltitle").value;
@@ -92,6 +102,7 @@
 						body: JSON.stringify(data)
 				};	
 				var url = '/maven-spring-mvc-sse/' + typeEv;
+				console.log(url);
 				//	'/maven-spring-mvc-sse/dispatchEventJSON'
 				const response = fetch(url, options);
 
@@ -117,7 +128,12 @@
 						},
 						body: JSON.stringify(data)
 				};	
-				fetch('/maven-spring-mvc-sse/dispatchEventJSONToSpecificUser', options).then(function(response) {console.log(response.status);});
+				fetch('/maven-spring-mvc-sse/dispatchEventJSONToSpecificUser', options).then(	function(response) 
+																									{
+																										console.log(response.status);
+																									});
+																								
+			
 /* 				var response = await fetch('/maven-spring-mvc-sse/dispatchEvent2ToSpecificUser', options);
 				console.log("stampa qualcosa? " + await responce.status); */
 			} 
@@ -134,6 +150,7 @@
 				console.log(text);
 				 var xhr = new XMLHttpRequest();
 				 var url = '/maven-spring-mvc-sse/' + typeEv;
+				 console.log(url);
 				 xhr.open("POST", url, true);
 	
 				 //Send the proper header information along with the request
@@ -180,9 +197,9 @@
    			  return new Promise(resolve => setTimeout(resolve, ms));
    			}
    			
-   		async function  send100JSON_All() {
+   		async function  send100JSON_All(typeEv) {
    				for (let i = 0; i < 100; i++) {
-   					await sleep(800).then(sendJSON_All());
+   					await sleep(800).then(sendJSON_All(typeEv));
    				}; 				
    			}
    		async function  send100JSON_ByID() {
@@ -190,9 +207,9 @@
    					await sleep(800).then(sendJSON_ByID());
    				};
    			}
-   		async function send100NewsAll(){
+   		async function send100NewsAll(typeEv){
    				for (let i = 0; i < 100; i++) {
-   					await sleep(800).then(sendNewsAll());
+   					await sleep(800).then(sendNewsAll(typeEv));
    				};
    			}
    		async function send100NewsByID(){
