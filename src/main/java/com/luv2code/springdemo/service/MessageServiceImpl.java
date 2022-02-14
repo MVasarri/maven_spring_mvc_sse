@@ -64,15 +64,18 @@ public class MessageServiceImpl implements MessageService {
         
         //l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino all'arrivo di una richiesta di ciusura da parte del client
         sseEmitter.onCompletion(() -> {
+        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi con: onCompletion' \n {}", emitters);
         });
 
         sseEmitter.onTimeout(() -> {
+        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("subscribers ancora Vivi dopo il Timeout' \n {}", emitters);
         });
-        sseEmitter.onError((e) -> {        	
+        sseEmitter.onError((e) -> {  
+        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onError' \n {}", emitters);
         });
@@ -135,6 +138,7 @@ public class MessageServiceImpl implements MessageService {
                 logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
                 //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
                 emitters.remove(userID);
+                lastMessageSend.remove(userID);
                 logger.error("emitters dopo: {}", emitters);
             }
         }else {
@@ -193,6 +197,7 @@ public class MessageServiceImpl implements MessageService {
                 logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
                 //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
                 emitters.remove(article.getUserID());
+                lastMessageSend.remove(article.getUserID());
                 logger.error("emitters dopo: {}", emitters);
             }
         }else {
@@ -223,6 +228,7 @@ public class MessageServiceImpl implements MessageService {
         } catch (IOException e) {
             logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
             emitters.remove(userID);
+            
         }
     }
     
@@ -232,6 +238,8 @@ public class MessageServiceImpl implements MessageService {
     	for (String id : emittersToBeDeleted) {
             //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
             emitters.remove(id);
+        	lastMessageSend.remove(id);
+
         }
     	logger.info("emitters dopo della cancellazione: {}", emitters);
 
