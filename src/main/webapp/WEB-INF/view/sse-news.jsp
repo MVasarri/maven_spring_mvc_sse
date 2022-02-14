@@ -77,10 +77,9 @@
 				
 				function setupEventSource() {
 							console.log("SUBSCRIBE");
-							//creo un evento per iscriversi al Sse
-							eventSource = new EventSource(url); // se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
+							eventSource = new EventSource(url); //creo un evento per inscriversi al Sse
+																// se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
 							console.log(eventSource);
-							
 							staCon(eventSource.readyState);
 							
 							eventSource.addEventListener("INIT", (event) => {
@@ -118,29 +117,29 @@
 							    el.appendChild(document.createElement('br'));
 							    el.appendChild(document.createTextNode(articleData.userID));
 							    el.appendChild(document.createElement('br'));
-							    el.appendChild(document.createElement('br')); */
+							    el.appendChild(document.createElement('br')); 
+*/
 							});
 		
-							//eventSource.onerror = (event) => {
 							eventSource.addEventListener("error", (event) => {
 								console.log("Error occured: ", event);  
+								if (eventSource.readyState == EventSource.CLOSED) {
+								   	console.log('connection è già closed');
+								} else {
+									console.log('è successo un qualche altro errore la connessione la chiusa');
+								}
 								eventSource.close();
-							      reconnectFunc();
-/* 									staCon(eventSource.readyState);
-									console.log("Error occured: ", event);
-									console.log("EventSource.CLOSED: ", EventSource.CLOSED);
-									console.log("event.target.readyState: ", event.target.readyState);
-									console.log("STATO eventSource: ", eventSource.readyState);
-									if (event.target.readyState == EventSource.CLOSED) {
-									   	console.log('connection is closed');
-									} else {
-										console.log("STATO eventSource: ", eventSource.readyState);
-									   	//è il punto in cui riconosce che la connessione del client è stata persa
-									   	// TO-DO:
-									   	// 			gestire la riconnessione automatica
-									}
-									event.target.close(); */
-							});			
+							    reconnectFunc();
+							});	
+							
+/* 				
+							window.addEventListener('online', (event) => {
+								if (eventSource.readyState == EventSource.CLOSED) {
+									console.log('ricreata nuova connessione eventSource');
+									reconnectFunc();
+								}
+							}); 
+*/
 				}		
 											
 				setupEventSource(staCon);
@@ -156,17 +155,7 @@
 						console.log('unsubscribe lanciata');
 				});
 				
-/* 				// addEventListener version
-				window.addEventListener('online', (event) => {
-				    console.log("You are now connected to the network.");
-				    console.log("event: ",event);
-				    console.log("eventSource: ", eventSource);
-					if (eventSource.readyState == EventSource.CLOSED) {
-						console.log('ricreata nuova connessione eventSource');
-						setupEventSource();
-						//var eventSource = new EventSource(url); 	
-					}
-				}); */
+
 
         </script>
 
