@@ -24,14 +24,14 @@ public class HomeController {
 		return "main-menu";
 	}
 	
-	@RequestMapping("/sseNews")
+	@RequestMapping("/messageReceiver")
 	public String showPageNews( ) {
-		return "sse-news";
+		return "message-receiver";
 	}
 	
-	@RequestMapping("/newsSender")
+	@RequestMapping("/messageSender")
 	public String showPageNewsSender( ) {
-		return "news-sender";
+		return "message-sender";
 	}
 
 }

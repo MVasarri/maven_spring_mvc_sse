@@ -2,13 +2,12 @@ package com.luv2code.springdemo.service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.dataTransfert.ArticleModel;
+import com.luv2code.springdemo.dataTransfert.MessageEntityModel;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -30,11 +29,15 @@ public class MessageServiceImpl implements MessageService {
     
     public Map<String, Integer> lastMessageSend = new HashMap<>();
     
+    private final AtomicInteger IDmessage = new AtomicInteger();
+    
+    List<MessageEntityModel> messageList = new CopyOnWriteArrayList<>();
+
+    
 	@Override
     public SseEmitter subscribe(String userID, Integer nNews) {
         //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
         //Long.MAX_VALUE, (long) 100000,   10_000L
-    	
 		SseEmitter sseEmitter;
 		if(emitters.get(userID) == null) {
 			
@@ -48,20 +51,17 @@ public class MessageServiceImpl implements MessageService {
 		else {
 			sseEmitter = emitters.get(userID);
 			logger.info("Ben tornato subscriber: {}", userID);
-			if(lastMessageSend.get(userID) > nNews) {
-				int mLost = lastMessageSend.get(userID) - nNews;
-				logger.error("Hai perso {} messaggi", mLost);
-			}
 		}
-
-
-
-        //sseEmitter.complete();
-
+		if(IDmessage.get() > nNews) {
+			//recoverMessage(nNews, userID, sseEmitter);
+			int mLost = lastMessageSend.get(userID) - nNews;
+			logger.error("Hai perso {} messaggi", mLost);
+		}
+		
+		
         logger.debug("stampa l'oggetto Sse' \n {}", sseEmitter);
         logger.debug("stampa la lista di Sse' \n {}", emitters);
-
-        
+    
         //l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino all'arrivo di una richiesta di ciusura da parte del client
         sseEmitter.onCompletion(() -> {
         	lastMessageSend.remove(userID);
@@ -82,90 +82,31 @@ public class MessageServiceImpl implements MessageService {
 
         return sseEmitter;
     }
-	
-	@Override
-    public void dispatchEventToClients(String title,  String text) throws InterruptedException, ExecutionException {        
-        logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' che ricevo dalla post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
-        String txtDestination = "Destinataro/i: All";
-        //trasformo le stringhe title & text in formato JSON
-        String eventFormatted = new JSONObject()
-                .put("title", title)
-                .put("text", text)
-                .put("userID", txtDestination).toString();
-        logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews' che ricevo dalla post dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
-		
-		//dichiarazione e creazione della lista di id di elementi da cancellare
-        List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
-        
-        for (String id : emitters.keySet()) {
-        	logger.debug("\n	Invoking an asynchronous method. {}", Thread.currentThread().getName());
-        	
-            SseEmitter emitter= emitters.get(id);
-        	lastMessageSend.put(id, lastMessageSend.get(id) + 1);
-        	try {
-                emitter.send(SseEmitter.event().name("latestNews").data(eventFormatted).reconnectTime(1000).id(lastMessageSend.get(id).toString()));
-                logger.debug("evento latestNews n:{} di tipo Send All inviato ID: {} ", lastMessageSend.get(id), id);
-            } catch (IOException e) {
-                logger.error("errore sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}",e);
-                //salvo l'id sulla lista dei eventi da cancellarte
-                emittersToBeDeleted.add(id);
-            }
-        }
-        //lacio una funzione che cancella elementi da una lista che indica gli eventi da cancellarte
-        if(!emittersToBeDeleted.isEmpty()) {
-            delateEmitter(emittersToBeDeleted);
-        }
-    }
     
 	@Override
-	public void dispatchEventToSpecificUser(String title,  String text,  String userID) {
-        logger.debug("\n	dispatchEvent- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews', ricevo tramite una post prima di riformattarlo in JSON\n		title: {}\n		paragrafo: {}", title, text);
-        String txtDestination = "Destinataro/i: "+ userID;
-        //trasformo le stringhe title & text in formato JSON
-        String eventFormatted = new JSONObject()
-                .put("title", title)
-                .put("text", text)
-                .put("userID", txtDestination).toString();
-        logger.debug("\n	dispatchEvent- DEBUG-01-  stampa l'articolo che inviera' all'evento 'latestNews',dopo averlo riformattarlo in JSON\n			articolo: {}", eventFormatted);
-		
-		SseEmitter sseEmitter = emitters.get(userID);
-    	lastMessageSend.put(userID, lastMessageSend.get(userID) + 1);
-        if (sseEmitter != null) {
-            try {
-                sseEmitter.send(SseEmitter.event().name("latestNews").data(eventFormatted).reconnectTime(1000).id(lastMessageSend.get(userID).toString()));
-                logger.debug("evento latestNews n:{} di tipo Send ById inviato ID: {}", lastMessageSend.get(userID),userID);
-            } catch (IOException e) {
-                logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
-                //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
-                emitters.remove(userID);
-                lastMessageSend.remove(userID);
-                logger.error("emitters dopo: {}", emitters);
-            }
-        }else {
-            logger.error("\n	il messaggio non è stato inviato perchè l'id non è presente");
-
-        }
-    }
-    
-	@Override
-    public void /*String*/ dispatchEventJSON(@RequestBody ArticleModel article) throws Exception {
-    	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
-
+    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel article) throws Exception {
+    	article.setMessageID(incrementIDmessage().toString());
+    	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n IDMessaggio: {} \n title: {}\n paragrafo: {}", article.getMessageID(), article.getTitle(), article.getText());
         ObjectMapper mapper = new ObjectMapper();
         String message = mapper.writeValueAsString(article);
-        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierà all'evento 'latestNews', dopo aver riconvertito l'articolo, da oggetto a stringa tramite Jeckson\n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
-        
+        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierà all'evento 'latestNews', dopo aver riconvertito l'articolo, da oggetto a stringa tramite Jeckson \n IDMessaggio: {} \n title: {}\n paragrafo: {}", article.getMessageID(), article.getTitle(), article.getText());
+        messageList.add(article);
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter= emitters.get(id);
-        	lastMessageSend.put(id, lastMessageSend.get(id) + 1);
+        	//lastMessageSend.put(id, lastMessageSend.get(id) + 1);
             try {
                 System.out.println("hello " + message);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
                 //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
-                emitter.send(SseEmitter.event().name("latestNews").data(message).reconnectTime(1000).id(lastMessageSend.get(id).toString()));
-                logger.debug("evento latestNews n: {} di tipo Send All inviato ID: {}", lastMessageSend.get(id),id);
+                emitter.send(SseEmitter.event()
+                						.name("latestNews")
+                						.data(message)
+                						.reconnectTime(1000)
+                						.id(article.getMessageID())
+				);
+                logger.debug("evento latestNews n: {} di tipo Send All inviato ID: {}", article.getMessageID(),id);
             } catch (IOException e) {
                 logger.error("errore sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}",e);
                 //salvo l'id sulla lista dei eventi da cancellarte
@@ -178,33 +119,7 @@ public class MessageServiceImpl implements MessageService {
         }
        // return "ha funzionato";
     }
-    
-	@Override
-    public void dispatchEventJSONToSpecificUser(@RequestBody ArticleModel article) throws Exception {
-    	logger.debug("dispatchEvent2- DEBUG-00- stampa l'articolo che invierà all'evento 'latestNews' nel formato JSON, ricevo dalla post dopo essere stato mappato come oggetto Articolo dal RequestBody \n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
-
-        ObjectMapper mapper = new ObjectMapper();
-        String message = mapper.writeValueAsString(article);
-        logger.debug("dispatchEvent2- DEBUG-01- stampa l'articolo che invierà all'evento 'latestNews', dopo aver riconvertito l'articolo, da oggetto a stringa tramite Jeckson\n title: {}\n paragrafo: {}", article.getTitle(), article.getText());
-        
-        SseEmitter sseEmitter = emitters.get(article.getUserID());
-    	lastMessageSend.put(article.getUserID(), lastMessageSend.get(article.getUserID()) + 1);
-        if (sseEmitter != null) {
-            try {
-                sseEmitter.send(SseEmitter.event().name("latestNews").data(message).reconnectTime(1000).id(lastMessageSend.get(article.getUserID()).toString()));
-                logger.debug("evento latestNews n:{} di tipo Send ById inviato ID: {}", lastMessageSend.get(article.getUserID()),article.getUserID());
-            } catch (IOException e) {
-                logger.error("si e' verificato sulla sseEmitter durante nella spedizione dell'evento 'latestNews' \n error: {}\n emitters prima: {}",e ,emitters);
-                //qui uso la rimozione, perchù non sono in grado di rilevare quando il client non è più connesso al mio emettitore
-                emitters.remove(article.getUserID());
-                lastMessageSend.remove(article.getUserID());
-                logger.error("emitters dopo: {}", emitters);
-            }
-        }else {
-            logger.error("\n	il messaggio non è stato inviato perchè l'id non è presente");
-
-        }
-    }
+   
     
 	@Override
     public void unsubscribe(@RequestParam String userID) {
@@ -227,23 +142,49 @@ public class MessageServiceImpl implements MessageService {
             logger.info("inizializzazione eseguita con successo del subscriber: {}", userID);
         } catch (IOException e) {
             logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
-            emitters.remove(userID);
-            
+            emitters.remove(userID);     
         }
     }
     
+    //questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare dei messaggi che in realta aveva già ricevuto
+    private void recoverMessage(Integer nNews, String userID, SseEmitter sseEmitter) {
+        //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
+    	for (MessageEntityModel message : messageList ) {
+        	try {
+                //invia un evento di inizializzazione ai client
+        		sseEmitter.send(SseEmitter.event()
+						.name("latestNews")
+						.data(message)
+						.reconnectTime(1000)
+						.id(message.getMessageID())
+        		);
+                logger.error("messaggio id:{} recuperato ", message.getMessageID());
+            } catch (IOException e) {
+                logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
+                emitters.remove(userID);     
+            }
+    	}
+    }
+    
+  
 
     private void delateEmitter(List<String> emittersToBeDeleted) {
     	logger.info("emitters prima della cancellazione: {}", emitters);
     	for (String id : emittersToBeDeleted) {
             //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
             emitters.remove(id);
-        	lastMessageSend.remove(id);
-
+        	//lastMessageSend.remove(id);
         }
     	logger.info("emitters dopo della cancellazione: {}", emitters);
-
 	}
+    
+    public Integer incrementIDmessage() {
+    	return IDmessage.getAndIncrement();
+    }
+    
+//    public Integer getIDmessage() {
+//        return IDmessage.get();
+//    }
 
 
 

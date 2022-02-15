@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.dataTransfert.ArticleModel;
+import com.luv2code.springdemo.dataTransfert.MessageEntityModel;
 import com.luv2code.springdemo.service.MessageService;
 
 @Component
@@ -25,22 +25,9 @@ public class AsyncMessageSseEComponent {
 	@Autowired
 	private  MessageService messageService;
 	
-	
+
 	@Async
-    public void async100mesWWW(String title, String text) throws ExecutionException {
-        logger.debug("Execute method asynchronously. {}", Thread.currentThread().getName());
-        for (int i = 0; i < 100; i++) {
-            try {
-                Thread.sleep(1000);
-                messageService.dispatchEventToClients(title, text);
-            } catch (final InterruptedException e) {
-            	logger.error("Errore nell'invio del messaggio tipo di errore: {}", e);
-            }        	
-        }
-    }
-	
-	@Async
-    public void async100mesJSON(ArticleModel article) throws Exception {
+    public void async100mesJSON(MessageEntityModel article) throws Exception {
         logger.debug("Execute method asynchronously. {}", Thread.currentThread().getName());
         for (int i = 0; i < 100; i++) {
             try {
