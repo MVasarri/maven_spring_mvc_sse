@@ -25,15 +25,11 @@ public class MessageServiceImpl implements MessageService {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     //creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
-    public Map<String, SseEmitter> emitters = new HashMap<>();
-    
-    public Map<String, Integer> lastMessageSend = new HashMap<>();
-    
-    private final AtomicInteger IDmessage = new AtomicInteger();
-    
+    public Map<String, SseEmitter> emitters = new HashMap<>(); 
+    //public Map<String, Integer> lastMessageSend = new HashMap<>();  
+    private final AtomicInteger IDmessage = new AtomicInteger(); 
     List<MessageEntityModel> messageList = new CopyOnWriteArrayList<>();
-
-    
+ 
 	@Override
     public SseEmitter subscribe(String userID, Integer nNews) {
         //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
@@ -44,18 +40,18 @@ public class MessageServiceImpl implements MessageService {
 			sseEmitter = new SseEmitter(Long.MAX_VALUE);
 	    	
 	        emitters.put(userID, sseEmitter);
-	        lastMessageSend.put(userID, nNews);
-	        sendinitEvent(userID, sseEmitter);
-	        logger.info("inizializzazione eseguita con successo del subscriber: {}", userID);
+	        sendinitEvent(userID, emitters.get(userID));
+	        logger.info("inizializzazione eseguita con successo del subscriber: {}", userID);        
 		}
 		else {
 			sseEmitter = emitters.get(userID);
 			logger.info("Ben tornato subscriber: {}", userID);
 		}
 		if(IDmessage.get() > nNews) {
-			//recoverMessage(nNews, userID, sseEmitter);
-			int mLost = lastMessageSend.get(userID) - nNews;
+			Integer mLost = IDmessage.get() - nNews;
 			logger.error("Hai perso {} messaggi", mLost);
+			recoverMessage(nNews, userID, emitters.get(userID));
+
 		}
 		
 		
@@ -64,18 +60,15 @@ public class MessageServiceImpl implements MessageService {
     
         //l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino all'arrivo di una richiesta di ciusura da parte del client
         sseEmitter.onCompletion(() -> {
-        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi con: onCompletion' \n {}", emitters);
         });
 
         sseEmitter.onTimeout(() -> {
-        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("subscribers ancora Vivi dopo il Timeout' \n {}", emitters);
         });
         sseEmitter.onError((e) -> {  
-        	lastMessageSend.remove(userID);
             emitters.remove(userID);
             logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onError' \n {}", emitters);
         });
@@ -95,7 +88,6 @@ public class MessageServiceImpl implements MessageService {
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter= emitters.get(id);
-        	//lastMessageSend.put(id, lastMessageSend.get(id) + 1);
             try {
                 System.out.println("hello " + message);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
@@ -145,35 +137,35 @@ public class MessageServiceImpl implements MessageService {
             emitters.remove(userID);     
         }
     }
-    
+      
     //questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare dei messaggi che in realta aveva già ricevuto
     private void recoverMessage(Integer nNews, String userID, SseEmitter sseEmitter) {
         //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
+    	//la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
     	for (MessageEntityModel message : messageList ) {
-        	try {
-                //invia un evento di inizializzazione ai client
-        		sseEmitter.send(SseEmitter.event()
-						.name("latestNews")
-						.data(message)
-						.reconnectTime(1000)
-						.id(message.getMessageID())
-        		);
-                logger.error("messaggio id:{} recuperato ", message.getMessageID());
-            } catch (IOException e) {
-                logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento INIT \n {}", e);
-                emitters.remove(userID);     
-            }
+        	if(Integer.parseInt(message.getMessageID()) >= nNews) {
+        		try {
+                    //invia un evento di inizializzazione ai client
+            		sseEmitter.send(SseEmitter.event()
+    						.name("latestNews")
+    						.data(message)
+    						.reconnectTime(1000)
+    						.id(message.getMessageID())
+            		);
+                    logger.error("messaggio id:{} recuperato ", message.getMessageID());
+                } catch (IOException e) {
+                    logger.error("si è verificato sulla sseEmitter durante nella spedizione dell'evento di Recupero dei messaggi \n {}", e);
+                    emitters.remove(userID);     
+                }
+        	}
     	}
     }
     
-  
-
     private void delateEmitter(List<String> emittersToBeDeleted) {
     	logger.info("emitters prima della cancellazione: {}", emitters);
     	for (String id : emittersToBeDeleted) {
             //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
             emitters.remove(id);
-        	//lastMessageSend.remove(id);
         }
     	logger.info("emitters dopo della cancellazione: {}", emitters);
 	}
@@ -182,9 +174,9 @@ public class MessageServiceImpl implements MessageService {
     	return IDmessage.getAndIncrement();
     }
     
-//    public Integer getIDmessage() {
-//        return IDmessage.get();
-//    }
+    public Integer getIDmessage() {
+        return IDmessage.get();
+    }
 
 
 

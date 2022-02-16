@@ -108,10 +108,9 @@
 			    var el = document.getElementById('idNews').innerHTML = articleData.userID;
 			    var el = document.getElementById('nNews').innerHTML = "ID messaggio aspettato: " + nNews;
 			    var el = document.getElementById('lastNews').innerHTML = "ID messaggio ricevuto: " + parseInt(event.lastEventId);
-			    if(parseInt(event.lastEventId) > nNews){
-			    	var mLost = (parseInt(event.lastEventId) - nNews);
-			    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
-			    }
+		    	var mLost = (parseInt(event.lastEventId) - nNews);
+		    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
+
 			    nNews = nNews +1;
 /* 							    
 				var el = document.getElementById('sseNews1');
