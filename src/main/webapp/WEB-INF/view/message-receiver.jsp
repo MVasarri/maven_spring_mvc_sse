@@ -42,7 +42,7 @@
 		var sp1 = document.getElementById('userID');
 		sp1.textContent = userID;
 		//url dove va ad ascoltare l'evento SseEmitter
-		var url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nNews=' + nNews;
+		var url = null;
 
 		var eventSource;
 		
@@ -79,6 +79,7 @@
 				
 		function setupEventSource() {
 			console.log("SUBSCRIBE");
+			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nNews=' + nNews;
 			eventSource = new EventSource(url); //creo un evento per inscriversi al Sse
 													// se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
 			console.log(eventSource);
