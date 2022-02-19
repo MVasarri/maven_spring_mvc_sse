@@ -37,7 +37,7 @@
 	<bean id="myDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close">
         <property name="driverClass" value="com.mysql.cj.jdbc.Driver" />
-        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/web_customer_tracker_01?useSSL=false&amp;serverTimezone=UTC" />
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/sse_message_tracker?useSSL=false&amp;serverTimezone=UTC" />
         <property name="user" value="springstudent" />
         <property name="password" value="springstudent" /> 
 

@@ -1,9 +1,21 @@
- package com.luv2code.springdemo.dataTransfert;
+ package com.luv2code.springdemo.entity;
 
-public class MessageEntityModel {
+ //@Entity
+ //@Table(name="message" )
+ public class MessageEntityModel {
+	
+	//@Id
+	//@GeneratedValue(strategy=GenerationType.IDENTITY)
+	//@Column(name="id")
 	private String messageID;
+	
+	//@Column(name="title")
 	private String title;
+	
+	//@Column(name="text")
     private String text;
+	
+	//@Column(name="userID")
     private String userID;
     
     
@@ -40,6 +52,14 @@ public class MessageEntityModel {
 	public void setUserID(String userID) {
 		this.userID = userID;
 	}
+
+//	@Override
+//	public String toString() {
+//		return "MessageEntityModel [messageID=" + messageID + ", title=" + title + ", text=" + text + ", userID="
+//				+ userID + "]";
+//	}
+
+	
 	
 	
 

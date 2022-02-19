@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.luv2code.springdemo.component.AsyncMessageSseEComponent;
-import com.luv2code.springdemo.dataTransfert.MessageEntityModel;
+import com.luv2code.springdemo.entity.MessageEntityModel;
 import com.luv2code.springdemo.service.MessageService;
 
 @RestController
@@ -46,14 +46,14 @@ public class MessageController {
 
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEventJSON", consumes = "application/json")
-    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel article) throws Exception {
-    	messageService.dispatchEventJSON(article);
+    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    	messageService.dispatchEventJSON(message);
     }
     
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatch100EventJSON", consumes = "application/json")
-    public void /*String*/ dispatch100EventJSON(@RequestBody MessageEntityModel article) throws Exception {
-    	asyncMessageSseEComponent.async100mesJSON(article);
+    public void /*String*/ dispatch100EventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    	asyncMessageSseEComponent.async100mesJSON(message);
     }
  
 

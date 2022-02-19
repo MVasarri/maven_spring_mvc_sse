@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.dataTransfert.MessageEntityModel;
+import com.luv2code.springdemo.entity.MessageEntityModel;
 import com.luv2code.springdemo.service.MessageService;
 
 @Component

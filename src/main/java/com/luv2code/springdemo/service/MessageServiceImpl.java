@@ -16,14 +16,18 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.dataTransfert.MessageEntityModel;
+import com.luv2code.springdemo.entity.MessageEntityModel;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    //creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
+	// need to inject address dao
+//	@Autowired
+//	private MessageDAO messageDAO;
+	
+	//creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
     public Map<String, SseEmitter> emitters = new HashMap<>(); 
     //public Map<String, Integer> lastMessageSend = new HashMap<>();  
     private final AtomicInteger IDmessage = new AtomicInteger(); 
@@ -63,31 +67,31 @@ public class MessageServiceImpl implements MessageService {
     
 	//@RequestBody MessageEntityModel article riceve i dati in formato JSON e li va a mettere nell'oggetto MessageEntityModel
 	@Override
-    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel article) throws Exception {
-		article.setMessageID(incrementIDmessage().toString());
-    	logger.debug("dispatchEventJSON- DEBUG-00- stampa l'articolo  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n paragrafo: {}", article.getMessageID(), article.getTitle(), article.getText());
+    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
+		message.setMessageID(incrementIDmessage().toString());
+    	logger.debug("dispatchEventJSON- DEBUG-00- stampa l'articolo  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n paragrafo: {}", message.getMessageID(), message.getTitle(), message.getText());
         //occore Jeckson per fare questa mappatura
     	ObjectMapper mapper = new ObjectMapper();
-        String message = mapper.writeValueAsString(article);
-        logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", message);
-        messageList.add(article);
+        String messageString = mapper.writeValueAsString(message);
+        logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
+        messageList.add(message);
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter= emitters.get(id);
             try {
-                System.out.println("hello " + message);
+                System.out.println("hello " + messageString);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
                 //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
                 emitter.send(SseEmitter.event()
                 						.name("latestNews")
-                						.data(message)
+                						.data(messageString)
                 						.reconnectTime(1000)
-                						.id(article.getMessageID())
+                						.id(message.getMessageID())
 				);
-                logger.debug("Il Server invia al Subscriber ID: {} evento latestNews n: {} ", id, article.getMessageID());
+                logger.debug("Il Server invia al Subscriber ID: {} evento latestNews n: {} ", id, message.getMessageID());
             } catch (IOException e) {
-                logger.error("Il Server non è riuscito ad invia al Subscriber ID: {} evento latestNews n: {} \nerrore: ", id, article.getMessageID(),e);
+                logger.error("Il Server non è riuscito ad invia al Subscriber ID: {} evento latestNews n: {} \nerrore: ", id, message.getMessageID(),e);
                 //salvo l'id sulla lista dei eventi da cancellarte
                 emittersToBeDeleted.add(id);
             }
@@ -166,9 +170,18 @@ public class MessageServiceImpl implements MessageService {
     }
 
 
+//	@Override
+//	@Transactional
+//	public void saveMessage(MessageEntityModel theMessage) {
+//
+//		messageDAO.saveMessage(theMessage);
+//	}
 
-
-
+//	@Override
+//	@Transactional
+//	public List<MessageEntityModel> getMessage() {
+//		return messageDAO.getMessage();
+//	}
     	
 
 	
