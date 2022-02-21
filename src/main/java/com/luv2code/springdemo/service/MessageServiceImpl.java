@@ -9,12 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.luv2code.springdemo.DAO.MessageDAO;
 import com.luv2code.springdemo.controller.HomeController;
 import com.luv2code.springdemo.entity.MessageEntityModel;
 
@@ -24,8 +27,8 @@ public class MessageServiceImpl implements MessageService {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
 	// need to inject address dao
-//	@Autowired
-//	private MessageDAO messageDAO;
+	@Autowired
+	private MessageDAO messageDAO;
 	
 	//creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
     public Map<String, SseEmitter> emitters = new HashMap<>(); 
@@ -67,7 +70,7 @@ public class MessageServiceImpl implements MessageService {
     
 	//@RequestBody MessageEntityModel article riceve i dati in formato JSON e li va a mettere nell'oggetto MessageEntityModel
 	@Override
-    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    public void  dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
 		message.setMessageID(incrementIDmessage().toString());
     	logger.debug("dispatchEventJSON- DEBUG-00- stampa l'articolo  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n paragrafo: {}", message.getMessageID(), message.getTitle(), message.getText());
         //occore Jeckson per fare questa mappatura
@@ -96,11 +99,11 @@ public class MessageServiceImpl implements MessageService {
                 emittersToBeDeleted.add(id);
             }
         }
+        messageDAO.saveMessage(message);
         //lacio una funzione che cancella elementi da una lista che indica gli eventi da cancellarte
         if(!emittersToBeDeleted.isEmpty()) {
             delateEmitter(emittersToBeDeleted);
         }
-       // return "ha funzionato";
     }
    
 	@Override
@@ -170,18 +173,18 @@ public class MessageServiceImpl implements MessageService {
     }
 
 
-//	@Override
-//	@Transactional
-//	public void saveMessage(MessageEntityModel theMessage) {
-//
-//		messageDAO.saveMessage(theMessage);
-//	}
+	@Override
+	@Transactional
+	public void saveMessage(MessageEntityModel theMessage) {
 
-//	@Override
-//	@Transactional
-//	public List<MessageEntityModel> getMessage() {
-//		return messageDAO.getMessage();
-//	}
+		messageDAO.saveMessage(theMessage);
+	}
+
+	@Override
+	@Transactional
+	public List<MessageEntityModel> getMessage() {
+		return messageDAO.getMessage();
+	}
     	
 
 	

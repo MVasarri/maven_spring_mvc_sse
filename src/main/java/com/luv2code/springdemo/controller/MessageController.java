@@ -1,9 +1,7 @@
 package com.luv2code.springdemo.controller;
 
-import java.util.concurrent.ExecutionException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,16 +20,16 @@ import com.luv2code.springdemo.service.MessageService;
 @RestController
 public class MessageController {
 	
+	// need to inject our message Service
+	@Autowired
+	private  MessageService messageService;
+	
 	// need to inject our asyncMessageSseEComponent
 	@Autowired
 	private  AsyncMessageSseEComponent asyncMessageSseEComponent;
 	
-	// need to inject our message Service
-	@Autowired
-	private  MessageService messageService;
-
-    private static final Logger logger
-            = LoggerFactory.getLogger(HomeController.class);
+//    private static final Logger logger
+//            = LoggerFactory.getLogger(HomeController.class);
 
     // method for client subscription
     //creiamo un endpoint di sottoscrizione che restituira l'oggetto SseEmitter
@@ -46,13 +44,13 @@ public class MessageController {
 
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEventJSON", consumes = "application/json")
-    public void /*String*/ dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    public void  dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
     	messageService.dispatchEventJSON(message);
     }
     
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatch100EventJSON", consumes = "application/json")
-    public void /*String*/ dispatch100EventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    public void  dispatch100EventJSON(@RequestBody MessageEntityModel message) throws Exception {
     	asyncMessageSseEComponent.async100mesJSON(message);
     }
  
