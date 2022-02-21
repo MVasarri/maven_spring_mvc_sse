@@ -23,8 +23,8 @@ import javax.persistence.Table;
 	@Column(name="text")
     private String text;
 	
-	@Column(name="userID")
-    private String userID;
+//	@Column(name="userID")
+//    private String userID;
     
     
 	public Long getMessageID() {
@@ -49,13 +49,13 @@ import javax.persistence.Table;
 		this.text = text;
 	}
 
-	public String getUserID() {
-		return userID;
-	}
-
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
+//	public String getUserID() {
+//		return userID;
+//	}
+//
+//	public void setUserID(String userID) {
+//		this.userID = userID;
+//	}
 
 //	@Override
 //	public String toString() {

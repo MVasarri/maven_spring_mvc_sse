@@ -22,6 +22,7 @@ import com.luv2code.springdemo.controller.HomeController;
 import com.luv2code.springdemo.entity.MessageEntityModel;
 
 @Service
+@Transactional
 public class MessageServiceImpl implements MessageService {
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
@@ -46,9 +47,9 @@ public class MessageServiceImpl implements MessageService {
         emitters.put(userID, sseEmitter);
 
         // TODO: chiedere al DB i messaggi da spedire, quelli con ID > nNews
-        
-        if (IDmessage.get() > nNews) {
-            Integer mLost = IDmessage.get() - nNews;
+        Integer lastMessageID = messageDAO.getLastID().intValue();
+        if (lastMessageID > nNews) {
+            Integer mLost = lastMessageID - nNews;
             logger.warn("Hai perso {} messaggi", mLost);
             recoverMessage(nNews, userID, emitters.get(userID));
         }
@@ -74,23 +75,22 @@ public class MessageServiceImpl implements MessageService {
     //@RequestBody MessageEntityModel article riceve i dati in formato JSON e li va a mettere nell'oggetto MessageEntityModel
     @Override
     public void dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
-        //message.setMessageID(incrementIDmessage().toString());
+        // dopo questa istruzione, l'ID sarà valorizzato
+    	//message.setMessageID(incrementIDmessage().toString());
         logger.debug("dispatchEventJSON- DEBUG-00- stampa l'articolo  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n paragrafo: {}", message.getMessageID(), message.getTitle(), message.getText());
+        messageDAO.saveMessage(message);
+        
         //occore Jeckson per fare questa mappatura
         ObjectMapper mapper = new ObjectMapper();
         String messageString = mapper.writeValueAsString(message);
         logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
-
-        // dopo questa istruzione, l'ID sarà valorizzato
-        messageDAO.saveMessage(message);
-
+     
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter = emitters.get(id);
             try {
-                // usare logger
-                System.out.println("hello " + messageString);
+                logger.debug("messageString: {}", messageString);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
                 //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
                 emitter.send(
@@ -141,15 +141,15 @@ public class MessageServiceImpl implements MessageService {
     private void recoverMessage(Integer nNews, String userID, SseEmitter sseEmitter) {
         //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
         //la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
-        for (MessageEntityModel message : messageList) {
-            if (Integer.parseInt(message.getMessageID()) >= nNews) {
+        for (MessageEntityModel message : messageDAO.getMessages()) {
+            if (message.getMessageID().intValue() >= nNews) {
                 try {
                     //invia un evento di inizializzazione ai client
                     sseEmitter.send(SseEmitter.event()
                             .name("latestNews")
                             .data(message)
                             .reconnectTime(1000)
-                            .id(message.getMessageID())
+                            .id(message.getMessageID().toString())
                     );
                     logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, message.getMessageID());
                 } catch (IOException e) {
@@ -180,16 +180,14 @@ public class MessageServiceImpl implements MessageService {
 //    }
 
     @Override
-    @Transactional
     public void saveMessage(MessageEntityModel theMessage) {
 
         messageDAO.saveMessage(theMessage);
     }
 
     @Override
-    @Transactional
     public List<MessageEntityModel> getMessage() {
-        return messageDAO.getMessage();
+        return messageDAO.getMessages();
     }
 
 }

@@ -36,17 +36,17 @@
 
 		//	async function  sendJSON_All() {
 			function  sendJSON_All(typeEv) {
-				var messageID = '###'; 
+				//var messageID = null; 
 				var title = document.getElementById("ltitle").value;
 		 		 var text = document.getElementById("ltext").value;
    				 if (title ==='' && text ===''){
    					title = "JSON News All sub - Default";
    					text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
    				 }
-  				var userID = 'Destinataro/i: All';
+  				//var userID = 'Destinataro/i: All';
 				console.log(title);
 				console.log(text);
-				const data = { messageID, title, text, userID};
+				const data = { /* messageID ,*/ title, text};
 				const options = {
 						method : 'POST',
 						headers: {

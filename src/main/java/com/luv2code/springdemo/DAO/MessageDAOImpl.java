@@ -1,5 +1,6 @@
 package com.luv2code.springdemo.DAO;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -24,7 +25,7 @@ public class MessageDAOImpl implements MessageDAO {
     	= LoggerFactory.getLogger(HomeController.class);
     
 	@Override
-	public List<MessageEntityModel> getMessage() {
+	public List<MessageEntityModel> getMessages() {
 		
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
@@ -41,11 +42,26 @@ public class MessageDAOImpl implements MessageDAO {
 		return messages;
 	}
 	
-	
+	@Override
+	public Long getLastID() {
+		
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+				
+		// create a query  ... sort by last name
+		Long lastId = 	(
+							(BigInteger) currentSession.createSQLQuery(
+											"SELECT LAST_INSERT_ID()")
+												.uniqueResult()
+						).longValue();
+				
+		// return the results		
+		return lastId;
+	}
 	
 	@Override
 	public void saveMessage(MessageEntityModel theMessage) {
-        logger.debug("L'oggetto theMessage è arrivato a destinazione \n{} ", theMessage);
+        logger.debug("L'oggetto theMessage è arrivato a destinazione \n IDMessaggio: {} \n title: {}\n paragrafo: {}", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		// get current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();

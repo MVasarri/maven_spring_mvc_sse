@@ -106,7 +106,7 @@
 			    console.log(articleData);
 			    var el = document.getElementById('ttlNews').innerHTML = articleData.title;
 			    var el = document.getElementById('txtNews').innerHTML = articleData.text;							    
-			    var el = document.getElementById('idNews').innerHTML = articleData.userID;
+			    //var el = document.getElementById('idNews').innerHTML = articleData.userID;
 			    var el = document.getElementById('nNews').innerHTML = "ID messaggio aspettato: " + nNews;
 			    var el = document.getElementById('lastNews').innerHTML = "ID messaggio ricevuto: " + parseInt(event.lastEventId);
 		    	var mLost = (parseInt(event.lastEventId) - nNews);
