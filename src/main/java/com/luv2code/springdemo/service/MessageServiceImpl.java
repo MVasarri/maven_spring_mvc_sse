@@ -48,7 +48,9 @@ public class MessageServiceImpl implements MessageService {
 
         // TODO: chiedere al DB i messaggi da spedire, quelli con ID > nNews
         Integer lastMessageID = messageDAO.getLastID().intValue();
-        if (lastMessageID > nNews) {
+        logger.info("lastMessageID: {} , nNews {}", lastMessageID, nNews);
+
+        if (lastMessageID != 0 && lastMessageID > nNews) {
             Integer mLost = lastMessageID - nNews;
             logger.warn("Hai perso {} messaggi", mLost);
             recoverMessage(nNews, userID, emitters.get(userID));
@@ -77,18 +79,22 @@ public class MessageServiceImpl implements MessageService {
     public void dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
         // dopo questa istruzione, l'ID sarà valorizzato
     	//message.setMessageID(incrementIDmessage().toString());
-        logger.debug("dispatchEventJSON- DEBUG-00- stampa l'articolo  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n paragrafo: {}", message.getMessageID(), message.getTitle(), message.getText());
+        logger.debug("dispatchEventJSON- DEBUG-00- stampa message  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
         messageDAO.saveMessage(message);
-        
+        logger.debug("dispatchEventJSON- DEBUG-01- stmpa \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
         //occore Jeckson per fare questa mappatura
         ObjectMapper mapper = new ObjectMapper();
         String messageString = mapper.writeValueAsString(message);
         logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
-     
+        
+        Integer lastMessageID = messageDAO.getLastID().intValue();
+        logger.info("lastMessageID: {} ", lastMessageID);
+        
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter = emitters.get(id);
+            String strMessageID = message.getMessageID().toString();
             try {
                 logger.debug("messageString: {}", messageString);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
@@ -98,11 +104,11 @@ public class MessageServiceImpl implements MessageService {
                                 .name("latestNews")
                                 .data(messageString)
                                 .reconnectTime(1000)
-                                .id(message.getMessageID().toString())
+                                .id(strMessageID)
                 );
-                logger.debug("Il Server invia al Subscriber ID: {} evento latestNews n: {} ", id, message.getMessageID());
+                logger.debug("Il Server invia al Subscriber ID: {} evento latestNews n: {} ", id, strMessageID);
             } catch (IOException e) {
-                logger.error("Il Server non è riuscito ad invia al Subscriber ID: {} evento latestNews n: {} \nerrore: ", id, message.getMessageID(), e);
+                logger.error("Il Server non è riuscito ad invia al Subscriber ID: {} evento latestNews n: {} \nerrore: ", id, strMessageID, e);
                 //salvo l'id sulla lista dei eventi da cancellarte
                 emittersToBeDeleted.add(id);
             }
@@ -143,17 +149,18 @@ public class MessageServiceImpl implements MessageService {
         //la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
         for (MessageEntityModel message : messageDAO.getMessages()) {
             if (message.getMessageID().intValue() >= nNews) {
-                try {
+                String strMessageID = message.getMessageID().toString();
+            	try {
                     //invia un evento di inizializzazione ai client
                     sseEmitter.send(SseEmitter.event()
                             .name("latestNews")
                             .data(message)
                             .reconnectTime(1000)
-                            .id(message.getMessageID().toString())
+                            .id(strMessageID)
                     );
-                    logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, message.getMessageID());
+                    logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, strMessageID);
                 } catch (IOException e) {
-                    logger.error("Il Server non è riuscito a far recuperare  l'evento latestNews n: {} al Subscriber ID: {} \nerrore: ", message.getMessageID(), userID, e);
+                    logger.error("Il Server non è riuscito a far recuperare  l'evento latestNews n: {} al Subscriber ID: {} \nerrore: ", strMessageID, userID, e);
                     emitters.remove(userID);
                     break;
                 }
@@ -179,15 +186,15 @@ public class MessageServiceImpl implements MessageService {
 //        return IDmessage.get();
 //    }
 
-    @Override
-    public void saveMessage(MessageEntityModel theMessage) {
-
-        messageDAO.saveMessage(theMessage);
-    }
-
-    @Override
-    public List<MessageEntityModel> getMessage() {
-        return messageDAO.getMessages();
-    }
+//    @Override
+//    public void saveMessage(MessageEntityModel theMessage) {
+//
+//        messageDAO.saveMessage(theMessage);
+//    }
+//
+//    @Override
+//    public List<MessageEntityModel> getMessage() {
+//        return messageDAO.getMessages();
+//    }
 
 }

@@ -13,9 +13,9 @@ public interface MessageService {
     
     public void unsubscribe(String userID);
     
-	public void saveMessage(MessageEntityModel theMessage);
-
-    public List<MessageEntityModel> getMessage();
+//	public void saveMessage(MessageEntityModel theMessage);
+//
+//    public List<MessageEntityModel> getMessage();
    
 
 

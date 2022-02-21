@@ -68,7 +68,8 @@ public class MessageDAOImpl implements MessageDAO {
 												.uniqueResult()
 						).longValue();
 				
-		// return the results		
+		// return the results	
+		//Long lastId = theQuery.
 		return lastId;
 	}
 	

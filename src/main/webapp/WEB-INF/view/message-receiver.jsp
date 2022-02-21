@@ -36,7 +36,7 @@
 
     <script type="text/javascript">
     
-   		var nNews = 0;
+   		var nNews = 1;
 
 		var userID = Math.floor((Math.random() * 1000) + 1);
 		var sp1 = document.getElementById('userID');
