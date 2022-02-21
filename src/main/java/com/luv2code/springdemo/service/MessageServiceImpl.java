@@ -87,7 +87,7 @@ public class MessageServiceImpl implements MessageService {
         String messageString = mapper.writeValueAsString(message);
         logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
         
-        Integer lastMessageID = messageDAO.getLastID().intValue();
+        long lastMessageID = messageDAO.getLastID();
         logger.info("lastMessageID: {} ", lastMessageID);
         
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
