@@ -13,9 +13,9 @@ import javax.persistence.Table;
  public class MessageEntityModel {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private String messageID;
+	private Long messageID;
 	
 	@Column(name="title")
 	private String title;
@@ -27,18 +27,14 @@ import javax.persistence.Table;
     private String userID;
     
     
-	public String getMessageID() {
+	public Long getMessageID() {
 		return messageID;
 	}
 
-	public void setMessageID(String messageID) {
+	public void setMessageID(Long messageID) {
 		this.messageID = messageID;
 	}
 
-	public MessageEntityModel() {
-
-	}
-    
 	public String getTitle() {
 		return title;
 	}
