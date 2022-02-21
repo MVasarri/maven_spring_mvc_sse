@@ -42,6 +42,19 @@ public class MessageDAOImpl implements MessageDAO {
 		return messages;
 	}
 	
+	
+	@Override
+	public MessageEntityModel getMessage(int theId) {
+
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+		
+		// now retrieve/read from database using the primary key
+		MessageEntityModel theMessage = currentSession.get(MessageEntityModel.class, theId);
+		
+		return theMessage;
+	}
+	
 	@Override
 	public Long getLastID() {
 		
