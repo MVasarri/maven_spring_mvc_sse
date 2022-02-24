@@ -32,7 +32,11 @@ public class AsyncMessageSseEComponent {
         for (int i = 0; i < 100; i++) {
             try {
                 Thread.sleep(1000);
-                messageService.dispatchEventJSON(message);
+                Message m = new Message();
+                m.setTitle("Messaggio n. " + i);
+                m.setText("Un testo di prova");
+                
+                messageService.dispatchEventJSON(m);
             } catch (final InterruptedException e) {
             	logger.error("Errore nell'invio del messaggio tipo di errore: {}", e);
             }        	

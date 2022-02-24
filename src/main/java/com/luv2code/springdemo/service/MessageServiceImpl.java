@@ -32,12 +32,10 @@ public class MessageServiceImpl implements MessageService {
     // need to inject message DAO
     @Autowired
     private MessageDAO messageDAO;
-    
+
     // need to inject client Service
     @Autowired
     private ClientService clientService;
-    
-    
 
     //creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
     public Map<String, SseEmitter> emitters = new HashMap<>();
@@ -52,22 +50,21 @@ public class MessageServiceImpl implements MessageService {
         //Long.MAX_VALUE, (long) 100000,   10_000L
         SseEmitter sseEmitter;
         sseEmitter = new SseEmitter(Long.MAX_VALUE);
-        
-        if(clientService.getClient(userID)==null) {
-        	Client subClient = new Client();
-        	subClient.setClientID(userID);
-        	subClient.setLastConnection(new Date().getTime());
-        	clientService.saveClient(subClient);
-        }else {
-            Client subClient = clientService.getClient(userID);
-        	subClient.setLastConnection(new Date().getTime());
-        	clientService.saveClient(subClient);
+
+        Client client = clientService.getClient(userID);
+        if (client == null) {
+            Client subClient = new Client();
+            subClient.setClientID(userID);
+            subClient.setLastConnection(new Date().getTime());
+            clientService.saveClient(subClient);
+        } else {
+            client.setLastConnection(new Date().getTime());
+            clientService.saveClient(client);
         }
 
         // TODO: controllare se sul DB userID è già presente ovvero se Client getClient(String userID), ritorna qualcosa o no
-	        // TODO: salva sul DB l'userID se non è presente
-	        // TODO: NON salvare sul DB l'userID se è già presente
-
+        // TODO: salva sul DB l'userID se non è presente
+        // TODO: NON salvare sul DB l'userID se è già presente
         emitters.put(userID, sseEmitter);
 
         //chiedere al DB i messaggi da spedire, quelli con ID > nNews
@@ -102,7 +99,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void dispatchEventJSON(@RequestBody Message message) throws Exception {
         // dopo questa istruzione, l'ID sarà valorizzato
-    	//message.setMessageID(incrementIDmessage().toString());
+        //message.setMessageID(incrementIDmessage().toString());
         logger.debug("dispatchEventJSON- DEBUG-00- stampa message  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
         messageDAO.saveMessage(message);
         logger.debug("dispatchEventJSON- DEBUG-01- stampa message tornato dal DB: \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
@@ -110,10 +107,10 @@ public class MessageServiceImpl implements MessageService {
         ObjectMapper mapper = new ObjectMapper();
         String messageString = mapper.writeValueAsString(message);
         logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
-        
+
         long lastMessageID = messageDAO.getLastID();
         logger.info("ultimo ID salvato sul DB:\nlastMessageID: {} ", lastMessageID);
-        
+
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
@@ -165,15 +162,16 @@ public class MessageServiceImpl implements MessageService {
 //            emitters.remove(userID);
 //        }
 //    }
-
     //questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare dei messaggi che in realta aveva già ricevuto
     private void recoverMessage(Integer nMsg, String userID, SseEmitter sseEmitter) {
         //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
         //la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
+
+        // SP: query che estrae SOLO i messaggi da inviare, che sono quelli con ID > nMsg
         for (Message message : messageDAO.getMessages()) {
             if (message.getMessageID().intValue() >= nMsg) {
                 String strMessageID = message.getMessageID().toString();
-            	try {
+                try {
                     //invia un evento di inizializzazione ai client
                     sseEmitter.send(SseEmitter.event()
                             .name("latestMsg")
@@ -209,7 +207,6 @@ public class MessageServiceImpl implements MessageService {
 //    public Integer getIDmessage() {
 //        return IDmessage.get();
 //    }
-
 //    @Override
 //    public void saveMessage(MessageEntityModel theMessage) {
 //
@@ -220,5 +217,4 @@ public class MessageServiceImpl implements MessageService {
 //    public List<MessageEntityModel> getMessage() {
 //        return messageDAO.getMessages();
 //    }
-
 }
