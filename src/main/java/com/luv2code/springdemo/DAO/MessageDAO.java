@@ -6,7 +6,10 @@ import com.luv2code.springdemo.entity.Message;
 
 public interface MessageDAO {
 	
+	public List<Message> getRecoverMessages(long nMsg);
+	
 	public List<Message> getMessages();
+
 	
 	public Message getMessage(int theId);
 	

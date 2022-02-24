@@ -69,11 +69,11 @@ public class MessageServiceImpl implements MessageService {
 
         //chiedere al DB i messaggi da spedire, quelli con ID > nNews
         Integer lastMessageID = messageDAO.getLastID().intValue();
-        logger.info("lastMessageID: {} , nNews {}", lastMessageID, nMsg);
+        logger.info("clientSub: {} lastMessageID: {} , nNews {}",userID, lastMessageID, nMsg);
 
         if (lastMessageID != 0 && lastMessageID > nMsg) {
             Integer mLost = lastMessageID - nMsg;
-            logger.warn("Hai perso {} messaggi", mLost);
+            logger.warn("clientSub: {} Ha perso {} messaggi",userID, mLost);
             recoverMessage(nMsg, userID, emitters.get(userID));
         }
         logger.info("Client Subscriber salvato in un oggetto SseEmitter: {} id: {} ", sseEmitter, userID);
@@ -117,7 +117,7 @@ public class MessageServiceImpl implements MessageService {
             SseEmitter emitter = emitters.get(id);
             String strMessageID = message.getMessageID().toString();
             try {
-                logger.debug("messageString: {}", messageString);
+                logger.debug("messageString: {}, al client {}", messageString, id);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
                 //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
                 emitter.send(
@@ -187,6 +187,24 @@ public class MessageServiceImpl implements MessageService {
                 }
             }
         }
+//	      for (Message message : messageDAO.getRecoverMessages(nMsg.longValue())) {
+//	          String strMessageID = message.getMessageID().toString();
+//	          try {
+//	              //invia un evento di inizializzazione ai client
+//	              sseEmitter.send(SseEmitter.event()
+//	                      .name("latestMsg")
+//	                      .data(message)
+//	                      .reconnectTime(1000)
+//	                      .id(strMessageID)
+//	              );
+//	              logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, strMessageID);
+//	          } catch (IOException e) {
+//	              logger.error("Il Server non è riuscito a far recuperare  l'evento 'latestMsg' n: {} al Subscriber ID: {} \nerrore: ", strMessageID, userID, e);
+//	              emitters.remove(userID);
+//	              break;
+//	          }
+//	      }
+    	
     }
 
     private void delateEmitter(List<String> emittersToBeDeleted) {
@@ -195,7 +213,6 @@ public class MessageServiceImpl implements MessageService {
         for (String id : emittersToBeDeleted) {
             //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
             emitters.remove(id);
-
         }
         logger.info("Lista emitters dopo la cancellazione: {}", emitters);
     }

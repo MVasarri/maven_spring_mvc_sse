@@ -112,7 +112,7 @@
 			    var el = document.getElementById('nMsg').innerHTML = "ID messaggio aspettato: " + nMsg;
 			    var el = document.getElementById('lastMsg').innerHTML = "ID messaggio ricevuto: " + messageID;
 		    	var mLost = (messageID - nMsg);
-		    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
+		    	var el = document.getElementById('mLost').innerHTML = "Sono stati persi "+ mLost+ " messaggi";
 
 		    	nMsg = nMsg +1;
 

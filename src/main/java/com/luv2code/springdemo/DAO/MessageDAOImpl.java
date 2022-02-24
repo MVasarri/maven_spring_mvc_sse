@@ -26,7 +26,6 @@ public class MessageDAOImpl implements MessageDAO {
     
 	@Override
 	public List<Message> getMessages() {
-		
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 				
@@ -37,14 +36,31 @@ public class MessageDAOImpl implements MessageDAO {
 		 
 		// execute query and get result list
 		List<Message> messages = theQuery.getResultList();
-        logger.debug("lista messages raccolta dal DB \n clients: {}", messages);
-
-				
+        logger.debug("lista completa dei messages del DB \n clients: {}", messages);
+			
 		// return the results		
 		return messages;
 	}
 	
 	
+	@Override
+	public List<Message> getRecoverMessages(long nMsg) {
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+				
+		// create a query  ... sort by last name
+		Query<Message> theQuery = 
+				currentSession.createQuery("from Message WHERE id>= :MYID",
+						Message.class).setParameter("MYID", nMsg);
+		 
+		// execute query and get result list
+		List<Message> messages = theQuery.getResultList();
+        logger.debug("lista messages del DB a partire dal nMsg: {} \n clients: {}",nMsg, messages);			
+		// return the results		
+		return messages;
+	}
+
+
 	@Override
 	public Message getMessage(int theId) {
 
@@ -53,7 +69,7 @@ public class MessageDAOImpl implements MessageDAO {
 		
 		// now retrieve/read from database using the primary key
 		Message theMessage = currentSession.get(Message.class, theId);
-        logger.debug("L'oggetto theMessage è stato raccolto dal DB \n IDMessaggio: {} \n title: {}\n paragrafo: {} ", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
+        logger.debug("L'oggetto theMessage {} è stato raccolto dal DB \n IDMessaggio: {} \n title: {}\n paragrafo: {} ",theId, theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		return theMessage;
 	}
