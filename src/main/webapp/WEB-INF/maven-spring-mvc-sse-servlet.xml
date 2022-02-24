@@ -60,7 +60,36 @@
 		      <prop key="hibernate.hbm2ddl.auto">update</prop>
 		   </props>
 		</property>
-   </bean>	  
+   </bean>	
+   
+<!--     	
+    CONFIGURAZIONE H2 (alternativa a MYSQL)
+    <bean id="myDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+            <property name="driverClass" value="org.h2.Driver" />
+            <property name="jdbcUrl" value="jdbc:h2:mem:test" />
+            <property name="user" value="sa" />
+            <property name="password" value="" /> 
+
+            <property name="initialPoolSize" value="5"/>
+            <property name="minPoolSize" value="5" />
+            <property name="maxPoolSize" value="20" />
+            <property name="maxIdleTime" value="30000" />
+        </bean>  
+	
+        <bean id="sessionFactory"
+              class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+            <property name="dataSource" ref="myDataSource" />
+            <property name="packagesToScan" value="com.luv2code.springdemo.entity" />
+            <property name="hibernateProperties">
+                <props>
+                    <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                    <prop key="hibernate.show_sql">true</prop>
+                    <prop key="hibernate.hbm2ddl.auto">update</prop>
+                </props>
+            </property>
+        </bean>	  
+   -->
 
     <!-- Step 3: Setup Hibernate transaction manager -->
 	<bean id="myTransactionManager"
