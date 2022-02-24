@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.entity.MessageEntityModel;
+import com.luv2code.springdemo.entity.Message;
 
 @Repository
 public class MessageDAOImpl implements MessageDAO {
@@ -25,18 +25,20 @@ public class MessageDAOImpl implements MessageDAO {
     	= LoggerFactory.getLogger(HomeController.class);
     
 	@Override
-	public List<MessageEntityModel> getMessages() {
+	public List<Message> getMessages() {
 		
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 				
 		// create a query  ... sort by last name
-		Query<MessageEntityModel> theQuery = 
-				currentSession.createQuery("from MessageEntityModel",
-						MessageEntityModel.class);
+		Query<Message> theQuery = 
+				currentSession.createQuery("from Message",
+						Message.class);
 		 
 		// execute query and get result list
-		List<MessageEntityModel> messages = theQuery.getResultList();
+		List<Message> messages = theQuery.getResultList();
+        logger.debug("lista messages raccolta dal DB \n clients: {}", messages);
+
 				
 		// return the results		
 		return messages;
@@ -44,13 +46,14 @@ public class MessageDAOImpl implements MessageDAO {
 	
 	
 	@Override
-	public MessageEntityModel getMessage(int theId) {
+	public Message getMessage(int theId) {
 
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 		
 		// now retrieve/read from database using the primary key
-		MessageEntityModel theMessage = currentSession.get(MessageEntityModel.class, theId);
+		Message theMessage = currentSession.get(Message.class, theId);
+        logger.debug("L'oggetto theMessage è stato raccolto dal DB \n IDMessaggio: {} \n title: {}\n paragrafo: {} ", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		return theMessage;
 	}
@@ -74,14 +77,16 @@ public class MessageDAOImpl implements MessageDAO {
 	}
 	
 	@Override
-	public void saveMessage(MessageEntityModel theMessage) {
-        logger.debug("L'oggetto theMessage è arrivato a destinazione \n IDMessaggio: {} \n title: {}\n paragrafo: {}", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
+	public void saveMessage(Message theMessage) {
+        logger.debug("L'oggetto theMessage è arrivato a destinazione nel DAO\n IDMessaggio: {} \n title: {}\n paragrafo: {}", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		// get current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 		
 		// save/upate theMessage ... 
 		currentSession.saveOrUpdate(theMessage);
+        logger.debug("theMessage: salvato ");
+
 		
 	}
 

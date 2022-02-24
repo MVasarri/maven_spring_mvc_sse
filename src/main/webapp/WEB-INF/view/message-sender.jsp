@@ -7,12 +7,12 @@
 <title>Insert title here</title>
 </head>
 <body>
-			<h1>Invia News</h1>	
+			<h1>Invia Messaggio</h1>	
 			<div>	
 				<form >
-					  <label for="ltitle">Titolo Articolo:</label><br>
+					  <label for="ltitle">Titolo Messaggio:</label><br>
 					  <input type="text" id="ltitle" name="ltitle" value=""><br>
-					  <label for="ltext">Testo Articolo:</label><br>
+					  <label for="ltext">Testo Messaggio:</label><br>
 					  <input type="text" id="ltext" name="ltext" value=""><br><br>
 						<div>
 							<input type="button" value="sendJSON_All"

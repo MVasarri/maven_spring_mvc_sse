@@ -2,16 +2,16 @@ package com.luv2code.springdemo.DAO;
 
 import java.util.List;
 
-import com.luv2code.springdemo.entity.MessageEntityModel;
+import com.luv2code.springdemo.entity.Message;
 
 public interface MessageDAO {
 	
-	public List<MessageEntityModel> getMessages();
+	public List<Message> getMessages();
 	
-	public MessageEntityModel getMessage(int theId);
+	public Message getMessage(int theId);
 	
 	public Long getLastID();
 	
-	public void saveMessage(MessageEntityModel theMessage);
+	public void saveMessage(Message theMessage);
 
 }

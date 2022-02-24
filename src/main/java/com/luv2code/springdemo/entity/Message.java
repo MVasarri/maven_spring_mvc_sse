@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
  @Table(name="message" )
- public class MessageEntityModel {
+ public class Message {
 	
 	@Id
 	//@GeneratedValue(strategy=GenerationType.AUTO )IDENTITY

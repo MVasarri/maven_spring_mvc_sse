@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.luv2code.springdemo.component.AsyncMessageSseEComponent;
-import com.luv2code.springdemo.entity.MessageEntityModel;
+import com.luv2code.springdemo.entity.Message;
 import com.luv2code.springdemo.service.MessageService;
 
 @RestController
@@ -38,19 +38,19 @@ public class MessageController {
     //nell'annotazione @RequestMapping.   
 	@CrossOrigin
 	@RequestMapping(value = "/subscribe", consumes = MediaType.ALL_VALUE)
-	public SseEmitter subscribe(@RequestParam String userID, @RequestParam Integer nNews) {
-	     return messageService.subscribe(userID, nNews);
+	public SseEmitter subscribe(@RequestParam String userID, @RequestParam Integer nMsg) {
+	     return messageService.subscribe(userID, nMsg);
 	} 
 
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEventJSON", consumes = "application/json")
-    public void  dispatchEventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    public void  dispatchEventJSON(@RequestBody Message message) throws Exception {
     	messageService.dispatchEventJSON(message);
     }
     
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatch100EventJSON", consumes = "application/json")
-    public void  dispatch100EventJSON(@RequestBody MessageEntityModel message) throws Exception {
+    public void  dispatch100EventJSON(@RequestBody Message message) throws Exception {
     	asyncMessageSseEComponent.async100mesJSON(message);
     }
  

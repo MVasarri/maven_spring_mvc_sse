@@ -17,17 +17,17 @@
 <body>		
 
 	<div>
-        <h1>News sse client</h1>
+        <h1>Message SSE client Receiver</h1>
         <h4>User ID: <span id="userID"></span></h4>
     </div>
 
     <div class="grid-container">
-        <div id="sseNews1">
-        	<h6 id="ttlNews"></h6>
-        	<p id="txtNews"></p>
-        	<p id="idNews"></p>
-        	<p id="nNews"></p>
-        	<p id="lastNews"></p>
+        <div id="sseMsg">
+        	<h6 id="ttlMsg"></h6>
+        	<p id="txtMsg"></p>
+        	<p id="idMsg"></p>
+        	<p id="nMsg"></p>
+        	<p id="lastMsg"></p>
         	<p id="mLost"></p>
         	
         
@@ -36,7 +36,8 @@
 
     <script type="text/javascript">
     
-   		var nNews = 1;
+   		var nMsg = 1;
+   		//var lastIdMsg = null;
 
 		var userID = Math.floor((Math.random() * 1000) + 1);
 		var sp1 = document.getElementById('userID');
@@ -79,15 +80,15 @@
 				
 		function setupEventSource() {
 			console.log("SUBSCRIBE");
-			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nNews=' + nNews;
+			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nMsg=' + nMsg;
 			eventSource = new EventSource(url); //creo un evento per inscriversi al Sse
 													// se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
 			console.log(eventSource);
 			staCon(eventSource.readyState);
 				
-			eventSource.addEventListener("INIT", (event) => {
+/* 			eventSource.addEventListener("INIT", (event) => {
 			    console.log("Evento INIT ricevuto, connessione con il server avviata:", event);
-			});
+			}); */
 				
 			eventSource.onopen = (event) => {
 				staCon(eventSource.readyState);
@@ -96,28 +97,34 @@
 			};
 							
 			//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
-			eventSource.addEventListener("latestNews", (event) => {
+			eventSource.addEventListener("latestMsg", (event) => {
 				console.log("Ricevuto evento", event);
 			    staCon(eventSource.readyState);
-			    const articleData = JSON.parse(event.data);
-			    //const articleData = event.data;
+			    const messageData = JSON.parse(event.data);
+			    const messageID = parseInt(event.lastEventId);
+			    //const messageData = event.data;
 				console.log("ultimo id evento ricevuto", event.lastEventId);
 			    
-			    console.log(articleData);
-			    var el = document.getElementById('ttlNews').innerHTML = articleData.title;
-			    var el = document.getElementById('txtNews').innerHTML = articleData.text;							    
-			    //var el = document.getElementById('idNews').innerHTML = articleData.userID;
-			    var el = document.getElementById('nNews').innerHTML = "ID messaggio aspettato: " + nNews;
-			    var el = document.getElementById('lastNews').innerHTML = "ID messaggio ricevuto: " + parseInt(event.lastEventId);
-		    	var mLost = (parseInt(event.lastEventId) - nNews);
+			    console.log(messageData);
+			    var el = document.getElementById('ttlMsg').innerHTML = messageData.title;
+			    var el = document.getElementById('txtMsg').innerHTML = messageData.text;							    
+			    //var el = document.getElementById('idMsg').innerHTML = messageData.userID;
+			    var el = document.getElementById('nMsg').innerHTML = "ID messaggio aspettato: " + nMsg;
+			    var el = document.getElementById('lastMsg').innerHTML = "ID messaggio ricevuto: " + messageID;
+		    	var mLost = (messageID - nMsg);
 		    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
 
-			    nNews = nNews +1;
+		    	nMsg = nMsg +1;
+
+/* 			    if(lastIdMsg != messageID){
+			    	lastIdMsg = messageID;
+			    	nMsg = nMsg +1;
+			    } */
 /* 							    
-				var el = document.getElementById('sseNews1');
-			    el.appendChild(document.createTextNode(articleData.title));
+				var el = document.getElementById('sseMsg');
+			    el.appendChild(document.createTextNode(messageData.title));
 			    el.appendChild(document.createElement('br'));
-			    el.appendChild(document.createTextNode(articleData.text));
+			    el.appendChild(document.createTextNode(messageData.text));
 			    el.appendChild(document.createElement('br'));
 			    el.appendChild(document.createTextNode(articleData.userID));
 			    el.appendChild(document.createElement('br'));

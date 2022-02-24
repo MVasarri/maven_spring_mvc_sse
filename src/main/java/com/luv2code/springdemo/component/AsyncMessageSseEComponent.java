@@ -1,7 +1,7 @@
 package com.luv2code.springdemo.component;
 
 
-import java.util.concurrent.ExecutionException;
+//import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.luv2code.springdemo.controller.HomeController;
-import com.luv2code.springdemo.entity.MessageEntityModel;
+import com.luv2code.springdemo.entity.Message;
 import com.luv2code.springdemo.service.MessageService;
 
 @Component
@@ -27,12 +27,12 @@ public class AsyncMessageSseEComponent {
 	
 
 	@Async
-    public void async100mesJSON(MessageEntityModel article) throws Exception {
+    public void async100mesJSON(Message message) throws Exception {
         logger.debug("Execute method asynchronously. {}", Thread.currentThread().getName());
         for (int i = 0; i < 100; i++) {
             try {
                 Thread.sleep(1000);
-                messageService.dispatchEventJSON(article);
+                messageService.dispatchEventJSON(message);
             } catch (final InterruptedException e) {
             	logger.error("Errore nell'invio del messaggio tipo di errore: {}", e);
             }        	
