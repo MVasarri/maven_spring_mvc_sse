@@ -25,7 +25,7 @@ public class MessageDAOImpl implements MessageDAO {
     	= LoggerFactory.getLogger(HomeController.class);
     
 	@Override
-	public List<Message> getMessages() {
+	public List<Message> getAllMessages() {
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 				
@@ -36,7 +36,7 @@ public class MessageDAOImpl implements MessageDAO {
 		 
 		// execute query and get result list
 		List<Message> messages = theQuery.getResultList();
-        logger.debug("lista completa dei messages del DB \n clients: {}", messages);
+        logger.debug("lista completa dei messages del DB 'getAllMessages'\n clients: {}", messages);
 			
 		// return the results		
 		return messages;
@@ -44,18 +44,18 @@ public class MessageDAOImpl implements MessageDAO {
 	
 	
 	@Override
-	public List<Message> getRecoverMessages(long nMsg) {
+	public List<Message> getRecoverMessages(long prevMsgID) {
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 				
 		// create a query  ... sort by last name
 		Query<Message> theQuery = 
 				currentSession.createQuery("from Message WHERE id>= :MYID",
-						Message.class).setParameter("MYID", nMsg);
+						Message.class).setParameter("MYID", prevMsgID);
 		 
 		// execute query and get result list
 		List<Message> messages = theQuery.getResultList();
-        logger.debug("lista messages del DB a partire dal nMsg: {} \n clients: {}",nMsg, messages);			
+        logger.debug("'getRecoverMessages' lista messages del DB a partire dal nMsg: {} \n messages: {}",prevMsgID, messages);			
 		// return the results		
 		return messages;
 	}
@@ -69,39 +69,71 @@ public class MessageDAOImpl implements MessageDAO {
 		
 		// now retrieve/read from database using the primary key
 		Message theMessage = currentSession.get(Message.class, theId);
-        logger.debug("L'oggetto theMessage {} è stato raccolto dal DB \n IDMessaggio: {} \n title: {}\n paragrafo: {} ",theId, theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
+        logger.debug("L'oggetto theMessage {} è stato raccolto dal DB 'getMessage'\n IDMessaggio: {} \n title: {}\n text: {} ",theId, theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		return theMessage;
 	}
 	
 	@Override
-	public Long getLastID() {
-		
+	public Long getLastID() {	
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 				
 		// create a query  ... sort by last name
-		Long lastId = 	(
-							(BigInteger) currentSession.createSQLQuery(
-											"SELECT LAST_INSERT_ID()")
+		Long lastId = 	((Integer) currentSession.createSQLQuery(
+											"SELECT max(id) FROM Message")
 												.uniqueResult()
 						).longValue();
-				
+        logger.debug("'getLastID' DAO ultimo id caricato sul DB lastID: {} ",lastId);
+
 		// return the results	
 		//Long lastId = theQuery.
 		return lastId;
 	}
 	
 	@Override
+	public Long countDBMsg() {
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+				
+		// create a query  ... sort by last name
+		Long countM = 	((BigInteger) currentSession.createSQLQuery(
+											"SELECT count(id) FROM Message")
+												.uniqueResult()
+						).longValue();
+        logger.debug("'countDBmessages' DAO Numero di messaggi sul DB nDBMsg: {} ",countM);
+
+		return countM;
+	}
+	
+
+	@Override
+	public Long countMsgLost(long prevMsgID) {
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+				
+		// create a query  ... sort by last name
+		Long nMsgLost = 	((BigInteger) currentSession.createSQLQuery(
+											"SELECT count(id) FROM Message WHERE id>= :MYID")
+												.setParameter("MYID", prevMsgID)
+												.uniqueResult()
+						).longValue();
+        logger.debug("'countDBmessages' DAO Numero di messaggi sul DB nDBMsg: {} ",nMsgLost);
+
+		return nMsgLost;
+	}
+
+
+	@Override
 	public void saveMessage(Message theMessage) {
-        logger.debug("L'oggetto theMessage è arrivato a destinazione nel DAO\n IDMessaggio: {} \n title: {}\n paragrafo: {}", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
+        logger.debug("L'oggetto theMessage è arrivato a destinazione nel DAO 'saveMessage'\n IDMessaggio: {} \n title: {}\n text: {}", theMessage.getMessageID(), theMessage.getTitle(), theMessage.getText());
 		
 		// get current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 		
 		// save/upate theMessage ... 
 		currentSession.saveOrUpdate(theMessage);
-        logger.debug("theMessage: salvato ");
+        logger.debug("theMessage: {} salvato ", theMessage.getMessageID());
 
 		
 	}

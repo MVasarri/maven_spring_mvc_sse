@@ -26,7 +26,7 @@ public class ClientDAOImpl implements ClientDAO {
 	
 	@Override
 	public void saveClient(Client theClient) {
-        logger.debug("L'oggetto theClient è arrivato al DAO \n DatabaseClientID: {} \n ClientID: {}", theClient.getDatabaseClientID(), theClient.getClientID());
+        logger.debug("L'oggetto theClient è arrivato al DAO 'saveClient'\n DatabaseClientID: {} \n ClientID: {} \n lastConnection: {} ", theClient.getDatabaseClientID(), theClient.getClientID(), theClient.getLastConnection());
 		
 		// get current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
@@ -36,7 +36,7 @@ public class ClientDAOImpl implements ClientDAO {
 	}
 	
 	@Override
-	public List<Client> getClients(){
+	public List<Client> getAllClients(){
 		
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
@@ -48,7 +48,7 @@ public class ClientDAOImpl implements ClientDAO {
 		 
 		// execute query and get result list
 		List<Client> clients = theQuery.getResultList();
-        logger.debug("lista clients raccolta dal DB \n clients: {}", clients);
+        logger.debug("lista clients raccolta dal DB 'getAllClients'\n clients: {}", clients);
 
 				
 		// return the results		
@@ -59,7 +59,7 @@ public class ClientDAOImpl implements ClientDAO {
 	public Client getClient(String clientID) {
 		// TODO: va cambiata la funzione Get perche occorre una createQuery per  cervare sulla colonna clientID e non su ID del database
 		// TODO: va impostato clientID come paramentro unique per evitare che vengano caricati user con lo stesso ID sul database
-        logger.debug("Id del client Ricevitore ottenuto \n clientID: {} ", clientID );
+        logger.debug("Id del client Ricevitore arrivato al DAO 'getClient' \n clientID: {} ", clientID );
 
 		// get the current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
@@ -69,14 +69,14 @@ public class ClientDAOImpl implements ClientDAO {
 				currentSession.createQuery("FROM Client WHERE clientID= :MYID ",
 						Client.class).setParameter("MYID", clientID);
 		List<Client> clients = theQuery.getResultList();
-        logger.debug("lista clients è stato raccolto dal DB \n clients: {}", clients);
+        logger.debug("lista dei clients raccolti dal DB \n clients: {}", clients);
 
 		if(clients.isEmpty()) {
 			return null;
 		}
 		else {
 			//Client theClient = currentSession.get(Client.class, clientID);
-	        logger.debug("L'oggetto theClient è stato raccolto dal DB \n DatabaseClientID: {} \n ClientID: {}", clients.get(0).getDatabaseClientID(), clients.get(0).getClientID());
+	        logger.debug("L'oggetto theClient è stato raccolto dal DB 'getClients'\n DatabaseClientID: {} \n ClientID: {}", clients.get(0).getDatabaseClientID(), clients.get(0).getClientID());
 			return clients.get(0);
 		}
 	}

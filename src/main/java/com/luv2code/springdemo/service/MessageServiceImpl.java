@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
 //    List<MessageEntityModel> messageList = new CopyOnWriteArrayList<>();
 // 
     @Override
-    public SseEmitter subscribe(String userID, Integer nMsg) {
+    public SseEmitter subscribe(String userID, Integer prevMsgID) {
         //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
         //Long.MAX_VALUE, (long) 100000,   10_000L
         SseEmitter sseEmitter;
@@ -67,14 +67,17 @@ public class MessageServiceImpl implements MessageService {
         // TODO: NON salvare sul DB l'userID se è già presente
         emitters.put(userID, sseEmitter);
 
-        //chiedere al DB i messaggi da spedire, quelli con ID > nNews
-        Integer lastMessageID = messageDAO.getLastID().intValue();
-        logger.info("clientSub: {} lastMessageID: {} , nNews {}",userID, lastMessageID, nMsg);
+//      chiedere al DB i messaggi da spedire, quelli con ID > nNews
+//      Integer nDBMsg = messageDAO.countDBMsg().intValue();     
+        Integer lastDBMsgID = messageDAO.getLastID().intValue();
+        logger.info("clientSub: {}, lastDBMsgID: {} , prevMsgID {}",userID, lastDBMsgID, prevMsgID);
 
-        if (lastMessageID != 0 && lastMessageID > nMsg) {
-            Integer mLost = lastMessageID - nMsg;
-            logger.warn("clientSub: {} Ha perso {} messaggi",userID, mLost);
-            recoverMessage(nMsg, userID, emitters.get(userID));
+        
+        if (lastDBMsgID != 0 && lastDBMsgID > prevMsgID) {
+            //Integer mLost = nDBMsg - nMsg;
+            Integer nMsgLost = messageDAO.countMsgLost(prevMsgID.longValue()).intValue();
+            logger.warn("clientSub: {} Ha perso {} messaggi",userID, nMsgLost);
+            recoverMessage(prevMsgID, userID, emitters.get(userID));
         }
         logger.info("Client Subscriber salvato in un oggetto SseEmitter: {} id: {} ", sseEmitter, userID);
         logger.info("Mappa dei oggetti SseEmitter' \n {}", emitters);
@@ -106,18 +109,20 @@ public class MessageServiceImpl implements MessageService {
         //occore Jeckson per fare questa mappatura
         ObjectMapper mapper = new ObjectMapper();
         String messageString = mapper.writeValueAsString(message);
-        logger.debug("dispatchEventJSON- DEBUG-01- stampa l'articolo convertito da MessageEntityModel in Stringa \n message: {}", messageString);
+        logger.debug("dispatchEventJSON- DEBUG-01- stampa message convertito da MessageEntityModel in Stringa \n message: {}", messageString);
 
         long lastMessageID = messageDAO.getLastID();
         logger.info("ultimo ID salvato sul DB:\nlastMessageID: {} ", lastMessageID);
+        String nDBMsg = messageDAO.countDBMsg().toString();     
+
 
         List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
         //scorro l'elenco dove sono memorizzati i miei diversi clienti
         for (String id : emitters.keySet()) {
             SseEmitter emitter = emitters.get(id);
-            String strMessageID = message.getMessageID().toString();
+            //String strMessageID = message.getMessageID().toString();
             try {
-                logger.debug("messageString: {}, al client {}", messageString, id);
+                logger.debug("sseEmitter event 'latestMsg': {}, al client {}", messageString, id);
                 //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
                 //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
                 emitter.send(
@@ -125,11 +130,11 @@ public class MessageServiceImpl implements MessageService {
                                 .name("latestMsg")
                                 .data(messageString)
                                 .reconnectTime(1000)
-                                .id(strMessageID)
+                                .id(nDBMsg)
                 );
-                logger.debug("Il Server invia al Subscriber ID: {}, evento 'latestMsg' n: {} ", id, strMessageID);
+                logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", messageString, id);
             } catch (IOException e) {
-                logger.error("Il Server non è riuscito ad invia al Subscriber ID: {}, evento 'latestMsg' n: {} \nerrore: ", id, strMessageID, e);
+                logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", messageString, id, e);
                 //salvo l'id sulla lista dei eventi da cancellarte
                 emittersToBeDeleted.add(id);
             }
@@ -163,47 +168,52 @@ public class MessageServiceImpl implements MessageService {
 //        }
 //    }
     //questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare dei messaggi che in realta aveva già ricevuto
-    private void recoverMessage(Integer nMsg, String userID, SseEmitter sseEmitter) {
+    private void recoverMessage(Integer prevMsgID, String userID, SseEmitter sseEmitter) {
         //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
         //la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
 
         // SP: query che estrae SOLO i messaggi da inviare, che sono quelli con ID > nMsg
-        for (Message message : messageDAO.getMessages()) {
-            if (message.getMessageID().intValue() >= nMsg) {
-                String strMessageID = message.getMessageID().toString();
-                try {
-                    //invia un evento di inizializzazione ai client
-                    sseEmitter.send(SseEmitter.event()
-                            .name("latestMsg")
-                            .data(message)
-                            .reconnectTime(1000)
-                            .id(strMessageID)
-                    );
-                    logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, strMessageID);
-                } catch (IOException e) {
-                    logger.error("Il Server non è riuscito a far recuperare  l'evento 'latestMsg' n: {} al Subscriber ID: {} \nerrore: ", strMessageID, userID, e);
-                    emitters.remove(userID);
-                    break;
-                }
-            }
-        }
-//	      for (Message message : messageDAO.getRecoverMessages(nMsg.longValue())) {
-//	          String strMessageID = message.getMessageID().toString();
-//	          try {
-//	              //invia un evento di inizializzazione ai client
-//	              sseEmitter.send(SseEmitter.event()
-//	                      .name("latestMsg")
-//	                      .data(message)
-//	                      .reconnectTime(1000)
-//	                      .id(strMessageID)
-//	              );
-//	              logger.info("Il Subscriber {} ha recuperato il messaggio id:{} ", userID, strMessageID);
-//	          } catch (IOException e) {
-//	              logger.error("Il Server non è riuscito a far recuperare  l'evento 'latestMsg' n: {} al Subscriber ID: {} \nerrore: ", strMessageID, userID, e);
-//	              emitters.remove(userID);
-//	              break;
-//	          }
-//	      }
+//        for (Message message : messageDAO.getAllMessages()) {
+//            if (message.getMessageID().intValue() >= nMsg) {
+//                String strMessageID = message.getMessageID().toString();
+//                try {
+//                    logger.debug("sseEmitter event 'latestMsg': {}, al client {}", strMessageID, userID);
+//
+//                    //invia un evento di inizializzazione ai client
+//                    sseEmitter.send(SseEmitter.event()
+//                            .name("latestMsg")
+//                            .data(message)
+//                            .reconnectTime(1000)
+//                            .id(strMessageID)
+//                    );
+//                    logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", strMessageID, userID);
+//                } catch (IOException e) {
+//                    logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", strMessageID, userID, e);
+//                    emitters.remove(userID);
+//                    break;
+//                }
+//            }
+//        }
+          String nDBMsg = messageDAO.countDBMsg().toString();     
+	      for (Message message : messageDAO.getRecoverMessages(prevMsgID.longValue())) {
+	          String strMessageID = message.getMessageID().toString();
+	          try {
+                  logger.debug("sseEmitter event 'latestMsg': {}, al client {}", strMessageID, userID);
+
+	              //invia un evento di inizializzazione ai client
+	              sseEmitter.send(SseEmitter.event()
+	                      .name("latestMsg")
+	                      .data(message)
+	                      .reconnectTime(1000)
+	                      .id(nDBMsg)
+	              );
+                  logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", strMessageID, userID);
+	          } catch (IOException e) {
+	        	  logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", strMessageID, userID, e);
+	              emitters.remove(userID);
+	              break;
+	          }
+	      }
     	
     }
 

@@ -38,8 +38,8 @@ public class MessageController {
     //nell'annotazione @RequestMapping.   
 	@CrossOrigin
 	@RequestMapping(value = "/subscribe", consumes = MediaType.ALL_VALUE)
-	public SseEmitter subscribe(@RequestParam String userID, @RequestParam Integer nMsg) {
-	     return messageService.subscribe(userID, nMsg);
+	public SseEmitter subscribe(@RequestParam String userID, @RequestParam Integer prevMsgID) {
+	     return messageService.subscribe(userID, prevMsgID);
 	} 
 
     // method for dispatching events to all clients

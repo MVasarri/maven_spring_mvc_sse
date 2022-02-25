@@ -38,7 +38,9 @@ public class AsyncMessageSseEComponent {
                 
                 messageService.dispatchEventJSON(m);
             } catch (final InterruptedException e) {
-            	logger.error("Errore nell'invio del messaggio tipo di errore: {}", e);
+            	logger.error("Errore InterruptedException - nell'invio del messaggio tipo di errore: {}", e);
+            } catch (final Exception e) {
+            	logger.error("Errore Exception - nell'invio del messaggio tipo di errore: {}", e);
             }        	
         }
     }

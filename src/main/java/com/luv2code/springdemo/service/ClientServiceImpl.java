@@ -23,7 +23,7 @@ public class ClientServiceImpl implements ClientService {
 	}
 	@Override
 	public List<Client> getClients(){
-		return clientDAO.getClients();	
+		return clientDAO.getAllClients();	
 	}
 	@Override
 	public Client getClient(String clientID) {

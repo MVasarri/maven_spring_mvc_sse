@@ -26,9 +26,12 @@
         	<h6 id="ttlMsg"></h6>
         	<p id="txtMsg"></p>
         	<p id="idMsg"></p>
+        	<p id="mPrev"></p>
         	<p id="nMsg"></p>
+        	<p id="nDBMsg"></p>
         	<p id="lastMsg"></p>
-        	<p id="mLost"></p>
+        	
+        	
         	
         
         </div> 
@@ -36,8 +39,8 @@
 
     <script type="text/javascript">
     
-   		var nMsg = 1;
-   		//var lastIdMsg = null;
+   		var nMsg = 0;
+   		var prevMsgID = 0;
 
 		var userID = Math.floor((Math.random() * 1000) + 1);
 		var sp1 = document.getElementById('userID');
@@ -80,7 +83,7 @@
 				
 		function setupEventSource() {
 			console.log("SUBSCRIBE");
-			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nMsg=' + nMsg;
+			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&prevMsgID=' + prevMsgID;
 			eventSource = new EventSource(url); //creo un evento per inscriversi al Sse
 													// se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
 			console.log(eventSource);
@@ -98,28 +101,27 @@
 							
 			//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
 			eventSource.addEventListener("latestMsg", (event) => {
+				nMsg += 1;
 				console.log("Ricevuto evento", event);
 			    staCon(eventSource.readyState);
 			    const messageData = JSON.parse(event.data);
-			    const messageID = parseInt(event.lastEventId);
+			    const nDBMsg = parseInt(event.lastEventId);
 			    //const messageData = event.data;
 				console.log("ultimo id evento ricevuto", event.lastEventId);
 			    
 			    console.log(messageData);
 			    var el = document.getElementById('ttlMsg').innerHTML = messageData.title;
-			    var el = document.getElementById('txtMsg').innerHTML = messageData.text;							    
-			    //var el = document.getElementById('idMsg').innerHTML = messageData.userID;
-			    var el = document.getElementById('nMsg').innerHTML = "ID messaggio aspettato: " + nMsg;
-			    var el = document.getElementById('lastMsg').innerHTML = "ID messaggio ricevuto: " + messageID;
-		    	var mLost = (messageID - nMsg);
+			    el = document.getElementById('txtMsg').innerHTML = messageData.text;							    
+			    el = document.getElementById('idMsg').innerHTML = "ID messaggio ricevuto: " + messageData.messageID;
+			    el = document.getElementById('mPrev').innerHTML = "ID messaggio precedente: " + prevMsgID;
+			    el = document.getElementById('nMsg').innerHTML = "numero di messaggi ricevuti: " + nMsg;
+			    el = document.getElementById('nDBMsg').innerHTML = "numero di messaggi sul DB: " + nDBMsg;
+			    prevMsgID = messageData.messageID;
+			      
+			    /* var mLost = (messageID - nMsg);
 		    	var el = document.getElementById('mLost').innerHTML = "Sono stati persi "+ mLost+ " messaggi";
+ */
 
-		    	nMsg = nMsg +1;
-
-/* 			    if(lastIdMsg != messageID){
-			    	lastIdMsg = messageID;
-			    	nMsg = nMsg +1;
-			    } */
 /* 							    
 				var el = document.getElementById('sseMsg');
 			    el.appendChild(document.createTextNode(messageData.title));

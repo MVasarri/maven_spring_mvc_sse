@@ -7,7 +7,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.luv2code.springdemo.entity.Message;
 
 public interface MessageService {
-    public SseEmitter subscribe(String userID, Integer nNews);  
+    public SseEmitter subscribe(String userID, Integer prevMsgID);  
     
     public void dispatchEventJSON(Message message) throws Exception;
     
