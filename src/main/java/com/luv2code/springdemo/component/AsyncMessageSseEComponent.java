@@ -35,8 +35,8 @@ public class AsyncMessageSseEComponent {
                 Message m = new Message();
                 m.setTitle("Messaggio n. " + i);
                 m.setText("Un testo di prova");
-                
-                messageService.dispatchEventJSON(m);
+                String messagString = messageService.saveAndGetJSON(m);
+                messageService.dispatchEventJSON(messagString, m.getMessageID());
             } catch (final InterruptedException e) {
             	logger.error("Errore InterruptedException - nell'invio del messaggio tipo di errore: {}", e);
             } catch (final Exception e) {

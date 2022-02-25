@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luv2code.springdemo.DAO.MessageDAO;
 import com.luv2code.springdemo.controller.HomeController;
@@ -24,137 +25,142 @@ import com.luv2code.springdemo.entity.Client;
 import com.luv2code.springdemo.entity.Message;
 
 @Service
-@Transactional
 public class MessageServiceImpl implements MessageService {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    // need to inject message DAO
-    @Autowired
-    private MessageDAO messageDAO;
+	// need to inject message DAO
+	@Autowired
+	private MessageDAO messageDAO;
 
-    // need to inject client Service
-    @Autowired
-    private ClientService clientService;
+	// need to inject client Service
+	@Autowired
+	private ClientService clientService;
 
-    //creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori all'evento con una stringa che fa da ID , in modo che si possa mandare altri eventi ai subscribers mediante l'ID o inviando a tutti
-    public Map<String, SseEmitter> emitters = new HashMap<>();
+	// creiamo una Mappa dove immagazzinare le sottoscrizioni dei client-ricevitori
+	// all'evento con una stringa che fa da ID , in modo che si possa mandare altri
+	// eventi ai subscribers mediante l'ID o inviando a tutti
+	public Map<String, SseEmitter> emitters = new HashMap<>();
 
-    //public Map<String, Integer> lastMessageSend = new HashMap<>();  
+	// public Map<String, Integer> lastMessageSend = new HashMap<>();
 //    private final AtomicInteger IDmessage = new AtomicInteger(); 
 //    List<MessageEntityModel> messageList = new CopyOnWriteArrayList<>();
 // 
-    @Override
-    public SseEmitter subscribe(String userID, Integer prevMsgID) {
-        //creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
-        //Long.MAX_VALUE, (long) 100000,   10_000L
-        SseEmitter sseEmitter;
-        sseEmitter = new SseEmitter(Long.MAX_VALUE);
+	@Override
+	@Transactional
+	public SseEmitter subscribe(String userID, Integer prevMsgID) {
+		// creiamo l'oggetto sse, ci inserisco un time out molto grande, ma può essere
+		// impostato come si vuole e l'oggetto sseEmitter gestira gli errori di timeOut
+		// Long.MAX_VALUE, (long) 100000, 10_000L
+		SseEmitter sseEmitter;
+		sseEmitter = new SseEmitter(Long.MAX_VALUE);
 
-        Client client = clientService.getClient(userID);
-        if (client == null) {
-            Client subClient = new Client();
-            subClient.setClientID(userID);
-            subClient.setLastConnection(new Date().getTime());
-            clientService.saveClient(subClient);
-        } else {
-            client.setLastConnection(new Date().getTime());
-            clientService.saveClient(client);
-        }
+		Client client = clientService.getClient(userID);
+		if (client == null) {
+			Client subClient = new Client();
+			subClient.setClientID(userID);
+			subClient.setLastConnection(new Date().getTime());
+			clientService.saveClient(subClient);
+		} else {
+			client.setLastConnection(new Date().getTime());
+			clientService.saveClient(client);
+		}
 
-        // TODO: controllare se sul DB userID è già presente ovvero se Client getClient(String userID), ritorna qualcosa o no
-        // TODO: salva sul DB l'userID se non è presente
-        // TODO: NON salvare sul DB l'userID se è già presente
-        emitters.put(userID, sseEmitter);
+		// TODO: controllare se sul DB userID è già presente ovvero se Client
+		// getClient(String userID), ritorna qualcosa o no
+		// TODO: salva sul DB l'userID se non è presente
+		// TODO: NON salvare sul DB l'userID se è già presente
+		emitters.put(userID, sseEmitter);
 
 //      chiedere al DB i messaggi da spedire, quelli con ID > nNews
 //      Integer nDBMsg = messageDAO.countDBMsg().intValue();     
-        Integer lastDBMsgID = messageDAO.getLastID().intValue();
-        logger.info("clientSub: {}, lastDBMsgID: {} , prevMsgID {}",userID, lastDBMsgID, prevMsgID);
+		Integer lastDBMsgID = messageDAO.getLastID().intValue();
+		logger.info("clientSub: {}, lastDBMsgID: {} , prevMsgID {}", userID, lastDBMsgID, prevMsgID);
 
-        
-        if (lastDBMsgID != 0 && lastDBMsgID > prevMsgID) {
-            //Integer mLost = nDBMsg - nMsg;
-            Integer nMsgLost = messageDAO.countMsgLost(prevMsgID.longValue()).intValue();
-            logger.warn("clientSub: {} Ha perso {} messaggi",userID, nMsgLost);
-            recoverMessage(prevMsgID, userID, emitters.get(userID));
-        }
-        logger.info("Client Subscriber salvato in un oggetto SseEmitter: {} id: {} ", sseEmitter, userID);
-        logger.info("Mappa dei oggetti SseEmitter' \n {}", emitters);
+		if (lastDBMsgID != 0 && lastDBMsgID > prevMsgID) {
+			// Integer mLost = nDBMsg - nMsg;
+			Integer nMsgLost = messageDAO.countMsgLost(prevMsgID.longValue()).intValue();
+			logger.warn("clientSub: {} Ha perso {} messaggi", userID, nMsgLost);
+			recoverMessage(prevMsgID, userID, emitters.get(userID));
+		}
+		logger.info("Client Subscriber salvato in un oggetto SseEmitter: {} id: {} ", sseEmitter, userID);
+		logger.info("Mappa dei oggetti SseEmitter' \n {}", emitters);
 
-        //l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino all'arrivo di una richiesta di ciusura da parte del client
-        sseEmitter.onCompletion(() -> {
-            emitters.remove(userID);
-            logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi con: onCompletion' \n {}", emitters);
-        });
+		// l'evento onCompletion fa in modo che l'ascoltatore non venga rimosso una
+		// volta fatta la prima esecuzione, ma lo mantiene attivo nell'elenco fino
+		// all'arrivo di una richiesta di ciusura da parte del client
+		sseEmitter.onCompletion(() -> {
+			emitters.remove(userID);
+			logger.debug("stampa la lista di Sse, dopo la rimozione degli eventi conclusi con: onCompletion' \n {}",
+					emitters);
+		});
 //        sseEmitter.onTimeout(() -> {
 //            emitters.remove(userID);
 //            logger.debug("subscribers ancora Vivi dopo il Timeout' \n {}", emitters);
 //        });
-        sseEmitter.onError((e) -> {
-            emitters.remove(userID);
-            logger.warn("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onError' \n {}", emitters);
-        });
-        return sseEmitter;
-    }
+		sseEmitter.onError((e) -> {
+			emitters.remove(userID);
+			logger.warn("stampa la lista di Sse, dopo la rimozione degli eventi conclusi: onError' \n {}", emitters);
+		});
+		return sseEmitter;
+	}
 
-    //@RequestBody MessageEntityModel article riceve i dati in formato JSON e li va a mettere nell'oggetto MessageEntityModel
-    @Override
-    public void dispatchEventJSON(@RequestBody Message message) throws Exception {
-        // dopo questa istruzione, l'ID sarà valorizzato
-        //message.setMessageID(incrementIDmessage().toString());
-        logger.debug("dispatchEventJSON- DEBUG-00- stampa message  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
-        messageDAO.saveMessage(message);
-        logger.debug("dispatchEventJSON- DEBUG-01- stampa message tornato dal DB: \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
-        //occore Jeckson per fare questa mappatura
-        ObjectMapper mapper = new ObjectMapper();
-        String messageString = mapper.writeValueAsString(message);
-        logger.debug("dispatchEventJSON- DEBUG-01- stampa message convertito da MessageEntityModel in Stringa \n message: {}", messageString);
+	// @RequestBody MessageEntityModel article riceve i dati in formato JSON e li va
+	// a mettere nell'oggetto MessageEntityModel
+	@Override
+	public void dispatchEventJSON(String JSON, Long messageID) {
+		// dopo questa istruzione, l'ID sarà valorizzato
+		// message.setMessageID(incrementIDmessage().toString());
+//        logger.debug("dispatchEventJSON- DEBUG-00- stampa message  nel formato MessageEntityModel, ricevo dalla post \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
+//        messageDAO.saveMessage(message);
+//        logger.debug("dispatchEventJSON- DEBUG-01- stampa message tornato dal DB: \n IDMessaggio: {} \n title: {}\n text: {}", message.getMessageID(), message.getTitle(), message.getText());
+		// occore Jeckson per fare questa mappatura
+//        ObjectMapper mapper = new ObjectMapper();
+//        String messageString = mapper.writeValueAsString(message);
+//        logger.debug("dispatchEventJSON- DEBUG-01- stampa message convertito da MessageEntityModel in Stringa \n message: {}", messageString);
 
-        long lastMessageID = messageDAO.getLastID();
-        logger.info("ultimo ID salvato sul DB:\nlastMessageID: {} ", lastMessageID);
-        String nDBMsg = messageDAO.countDBMsg().toString();     
+//        long lastMessageID = messageDAO.getLastID();
+//        logger.info("ultimo ID salvato sul DB:\nlastMessageID: {} ", lastMessageID);
+//          String nDBMsg = messageDAO.countDBMsg().toString();     
 
+		List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
+		// scorro l'elenco dove sono memorizzati i miei diversi clienti
+		for (String id : emitters.keySet()) {
+			SseEmitter emitter = emitters.get(id);
+			// String strMessageID = message.getMessageID().toString();
+			try {
+				logger.debug("sseEmitter event 'latestMsg': {}, al client {}", JSON, id);
+				// inviero il mio evento latestNews con all'interno l'articolo ad ogni client
+				// presente nella lista
+				// To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto
+				// e togliere chi non è più in ascolto
+				emitter.send(
+						SseEmitter.event().name("latestMsg").data(JSON).reconnectTime(1000).id(messageID.toString()));
+				logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", JSON, id);
+			} catch (IOException e) {
+				logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", JSON, id,
+						e);
+				// salvo l'id sulla lista dei eventi da cancellarte
+				emittersToBeDeleted.add(id);
+			}
+		}
+		// lacio una funzione che cancella elementi da una lista che indica gli eventi
+		// da cancellarte
+		if (!emittersToBeDeleted.isEmpty()) {
+			delateEmitter(emittersToBeDeleted);
+		}
+	}
 
-        List<String> emittersToBeDeleted = new CopyOnWriteArrayList<>();
-        //scorro l'elenco dove sono memorizzati i miei diversi clienti
-        for (String id : emitters.keySet()) {
-            SseEmitter emitter = emitters.get(id);
-            //String strMessageID = message.getMessageID().toString();
-            try {
-                logger.debug("sseEmitter event 'latestMsg': {}, al client {}", messageString, id);
-                //inviero il mio evento latestNews con all'interno l'articolo ad ogni client presente nella lista
-                //To do Analizzare questo elenco per verifichare chi è tra questi ancora aperto e togliere chi non è più in ascolto
-                emitter.send(
-                        SseEmitter.event()
-                                .name("latestMsg")
-                                .data(messageString)
-                                .reconnectTime(1000)
-                                .id(nDBMsg)
-                );
-                logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", messageString, id);
-            } catch (IOException e) {
-                logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", messageString, id, e);
-                //salvo l'id sulla lista dei eventi da cancellarte
-                emittersToBeDeleted.add(id);
-            }
-        }
-        //lacio una funzione che cancella elementi da una lista che indica gli eventi da cancellarte
-        if (!emittersToBeDeleted.isEmpty()) {
-            delateEmitter(emittersToBeDeleted);
-        }
-    }
-
-    @Override
-    public void unsubscribe(@RequestParam String userID) {
-        SseEmitter sseEmitter = emitters.get(userID);
-        if (sseEmitter != null) {
-            sseEmitter.complete();
-            logger.info("Il subscriber sseEmitter {} è stato Completato", userID);
-        } else {
-            logger.warn("Il subscriber sseEmitter {} Non è Presente", userID);
-        }
-    }
+	@Override
+	public void unsubscribe(@RequestParam String userID) {
+		SseEmitter sseEmitter = emitters.get(userID);
+		if (sseEmitter != null) {
+			sseEmitter.complete();
+			logger.info("Il subscriber sseEmitter {} è stato Completato", userID);
+		} else {
+			logger.warn("Il subscriber sseEmitter {} Non è Presente", userID);
+		}
+	}
 
 //    private void sendinitEvent(String userID, SseEmitter sseEmitter) {
 //        //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
@@ -167,12 +173,15 @@ public class MessageServiceImpl implements MessageService {
 //            emitters.remove(userID);
 //        }
 //    }
-    //questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare dei messaggi che in realta aveva già ricevuto
-    private void recoverMessage(Integer prevMsgID, String userID, SseEmitter sseEmitter) {
-        //sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
-        //la mappatura per convertirlo da json ad oggetto non è necessaria perche la prendo dalla lista cheè gaà un oggetto
+	// questa tecnica rischia di sovrascrivere messaggi più recenti o di reinviare
+	// dei messaggi che in realta aveva già ricevuto
+	private void recoverMessage(Integer prevMsgID, String userID, SseEmitter sseEmitter) {
+		// sseEmiter.event richiede una catch per gestire eccezioni di tipo IO
+		// la mappatura per convertirlo da json ad oggetto non è necessaria perche la
+		// prendo dalla lista cheè gaà un oggetto
 
-        // SP: query che estrae SOLO i messaggi da inviare, che sono quelli con ID > nMsg
+		// SP: query che estrae SOLO i messaggi da inviare, che sono quelli con ID >
+		// nMsg
 //        for (Message message : messageDAO.getAllMessages()) {
 //            if (message.getMessageID().intValue() >= nMsg) {
 //                String strMessageID = message.getMessageID().toString();
@@ -194,38 +203,50 @@ public class MessageServiceImpl implements MessageService {
 //                }
 //            }
 //        }
-          String nDBMsg = messageDAO.countDBMsg().toString();     
-	      for (Message message : messageDAO.getRecoverMessages(prevMsgID.longValue())) {
-	          String strMessageID = message.getMessageID().toString();
-	          try {
-                  logger.debug("sseEmitter event 'latestMsg': {}, al client {}", strMessageID, userID);
+		String nDBMsg = messageDAO.countDBMsg().toString();
+		for (Message message : messageDAO.getRecoverMessages(prevMsgID.longValue())) {
+			String strMessageID = message.getMessageID().toString();
+			try {
+				logger.debug("sseEmitter event 'latestMsg': {}, al client {}", strMessageID, userID);
 
-	              //invia un evento di inizializzazione ai client
-	              sseEmitter.send(SseEmitter.event()
-	                      .name("latestMsg")
-	                      .data(message)
-	                      .reconnectTime(1000)
-	                      .id(nDBMsg)
-	              );
-                  logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", strMessageID, userID);
-	          } catch (IOException e) {
-	        	  logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ", strMessageID, userID, e);
-	              emitters.remove(userID);
-	              break;
-	          }
-	      }
-    	
-    }
+				// invia un evento di inizializzazione ai client
+				sseEmitter.send(SseEmitter.event().name("latestMsg").data(message).reconnectTime(1000).id(nDBMsg));
+				logger.debug("sseEmitter event 'latestMsg': {}, al client {} - INVIATA CORRETTAMENTE", strMessageID,
+						userID);
+			} catch (IOException e) {
+				logger.error("sseEmitter event 'latestMsg': {}, al client {} - ERRORE NELL'INVIO \nerrore: ",
+						strMessageID, userID, e);
+				emitters.remove(userID);
+				break;
+			}
+		}
 
-    private void delateEmitter(List<String> emittersToBeDeleted) {
-        logger.info("Lista emitters prima della cancellazione: {}", emitters);
-        logger.info("Lista emitters da cancellare: {}", emittersToBeDeleted);
-        for (String id : emittersToBeDeleted) {
-            //qui uso la rimozione, perchè non sono in grado di rilevare quando il client non è più connesso al mio emettitore
-            emitters.remove(id);
-        }
-        logger.info("Lista emitters dopo la cancellazione: {}", emitters);
-    }
+	}
+
+	private void delateEmitter(List<String> emittersToBeDeleted) {
+		logger.info("Lista emitters prima della cancellazione: {}", emitters);
+		logger.info("Lista emitters da cancellare: {}", emittersToBeDeleted);
+		for (String id : emittersToBeDeleted) {
+			// qui uso la rimozione, perchè non sono in grado di rilevare quando il client
+			// non è più connesso al mio emettitore
+			emitters.remove(id);
+		}
+		logger.info("Lista emitters dopo la cancellazione: {}", emitters);
+	}
+
+	@Override
+	@Transactional
+	public String saveAndGetJSON(Message message) throws JsonProcessingException {
+		messageDAO.saveMessage(message);
+		ObjectMapper mapper = new ObjectMapper();
+		String messageString = mapper.writeValueAsString(message);
+		logger.debug(
+				"dispatchEventJSON- DEBUG-01- stampa message convertito da MessageEntityModel in Stringa \n message: {}",
+				messageString);
+
+		return messageString;
+
+	}
 
 //    public Integer incrementIDmessage() {
 //        return IDmessage.getAndIncrement();

@@ -50,7 +50,7 @@ public class MessageDAOImpl implements MessageDAO {
 				
 		// create a query  ... sort by last name
 		Query<Message> theQuery = 
-				currentSession.createQuery("from Message WHERE id>= :MYID",
+				currentSession.createQuery("from Message WHERE id> :MYID",
 						Message.class).setParameter("MYID", prevMsgID);
 		 
 		// execute query and get result list
@@ -80,15 +80,18 @@ public class MessageDAOImpl implements MessageDAO {
 		Session currentSession = sessionFactory.getCurrentSession();
 				
 		// create a query  ... sort by last name
-		Long lastId = 	((Integer) currentSession.createSQLQuery(
+		Integer lastId = 	((Integer) currentSession.createSQLQuery(
 											"SELECT max(id) FROM Message")
 												.uniqueResult()
-						).longValue();
+						);
+		if(lastId==null) {
+			return 0L;
+		}
         logger.debug("'getLastID' DAO ultimo id caricato sul DB lastID: {} ",lastId);
 
 		// return the results	
 		//Long lastId = theQuery.
-		return lastId;
+		return lastId.longValue();
 	}
 	
 	@Override

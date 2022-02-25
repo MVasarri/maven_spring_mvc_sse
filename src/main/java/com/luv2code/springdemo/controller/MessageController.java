@@ -45,7 +45,8 @@ public class MessageController {
     // method for dispatching events to all clients
     @PostMapping(value = "/dispatchEventJSON", consumes = "application/json")
     public void  dispatchEventJSON(@RequestBody Message message) throws Exception {
-    	messageService.dispatchEventJSON(message);
+        String messagString = messageService.saveAndGetJSON(message);
+    	messageService.dispatchEventJSON(messagString, message.getMessageID());
     }
     
     // method for dispatching events to all clients
