@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `client`;
 CREATE TABLE `client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `clientID` varchar(1000) DEFAULT NULL,
-  `lastConnection` long DEFAULT NULL,
+  `lastConnection` varchar(1000) DEFAULT NULL,
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;

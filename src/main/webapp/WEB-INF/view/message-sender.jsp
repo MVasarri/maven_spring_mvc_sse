@@ -1,121 +1,64 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Message Sender</title>
+<link type="text/css" rel="stylesheet"
+	href="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/css/bootstrap.min.css">
 </head>
-<body>
-			<h1>Invia Messaggio</h1>	
-			<div>	
-				<form >
-					  <label for="ltitle">Titolo Messaggio:</label><br>
-					  <input type="text" id="ltitle" name="ltitle" value=""><br>
-					  <label for="ltext">Testo Messaggio:</label><br>
-					  <input type="text" id="ltext" name="ltext" value=""><br><br>
-						<div>
-							<input type="button" value="sendJSON_All"
-								   onclick= "sendJSON_All('dispatchEventJSON')"
-								   class="add-button"
-							/>
-							<input type="button" value="send100JSON_All"
-								   onclick= "send100JSON_All('dispatchEventJSON')"
-								   class="add-button"
-							/>	
-							<input type="button" value="repNews100JSON"
-								   onclick= "sendJSON_All('dispatch100EventJSON')"
-								   class="add-button"
-							/>						
-						</div>	
-				</form> 
-			</div>
+<body class="d-flex h-100 text-center text-secondary bg-dark">
 
-			
-		<script type="text/javascript">
+	<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+		<main class=" px-4 py-5">
+			<h1 class="display-5 fw-bold text-white">Invia Messaggio</h1>
+			<form>
+				<div class="mb-3">
+					<label for="sTitle" class="form-label"> Titolo Messaggio</label>
+					<!-- 					<input
+						type="text" class="form-control" id="sTitle"
+						aria-describedby="titleHelp"> -->
+					<select class="form-select" aria-label="Default select example"
+						id="sTitle">
+						<option selected>Pista N° 1</option>
+						<option value="1">Pista N° 2</option>
+						<option value="2">Pista N° 3</option>
+						<option value="3">Pista N° 4</option>
+					</select>
 
-		//	async function  sendJSON_All() {
-			function  sendJSON_All(typeEv) {
-				//var messageID = null; 
-				var title = document.getElementById("ltitle").value;
-		 		 var text = document.getElementById("ltext").value;
-   				 if (title ==='' && text ===''){
-   					title = "JSON News All sub - Default";
-   					text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
-   				 }
-  				//var userID = 'Destinataro/i: All';
-				console.log(title);
-				console.log(text);
-				const data = { /* messageID ,*/ title, text};
-				const options = {
-						method : 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify(data)
-				};	
-				var url = '/maven-spring-mvc-sse/' + typeEv;
-				console.log(url);
-				//	'/maven-spring-mvc-sse/dispatchEventJSON'
-				const response = fetch(url, options);
-/* 
-				const response = await fetch('/maven-spring-mvc-sse/dispatchEvent2', options);
-				console.log("stampa qualcosa? " + await responce.status); 
-*/
-  			}    
+				</div>
+				<div class="mb-3">
+					<label for="sText" class="form-label">Testo Messaggio</label>
+					<!-- 				<input
+						type="text" class="form-control" id="sText"> -->
+					<select class="form-select" aria-label="Default select example"
+						id="sText">
+						<option selected>La Pista leggermente Bagnata</option>
+						<option value="1">Strato Di ghiaccio sulla pista</option>
+						<option value="2">Pista Ben Asciutta</option>
+						<option value="3">Pista allagata e forti venti</option>
+					</select>
+				</div>
 
-	 
-	   		function sleep(ms) {
-	   			  return new Promise(resolve => setTimeout(resolve, ms));
-	   		}
-	   			
-	   		async function send100JSON_All(typeEv) {
-	   			for (let i = 0; i < 100; i++) {
-	   				await sleep(800).then(sendJSON_All(typeEv));
-	   			}; 				
-	   		}
-	   		async function send100JSON_ByID() {
-	   			for (let i = 0; i < 100; i++) {
-	   				await sleep(800).then(sendJSON_ByID());
-	   			};
-	   		}			  			
-/*		 
-			function sendJSON(){		
-			 	
-			 	const title = "messaggio 1";
-			 	const text =  "vediamo de questo messaggio va";
-			 
-	            // Creating a XHR object
-	            var xhr = new XMLHttpRequest();
-	            var url = '/maven-spring-mvc-sse/dispatchEventJSON';
-	       
-	            // open a connection
-	            xhr.open("POST", url, true);
-	 
-	            // Set the request header i.e. which type of content you are sending
-	            xhr.setRequestHeader("Content-Type", "application/json");
-	 
-	            // Create a state change callback
-	            xhr.onreadystatechange = function () {
-	                if (xhr.readyState === 4 && xhr.status === 200) {
-	                    // Print received data from server
-	                    //result.innerHTML = this.responseText;
-	                    console.log("inviato: " + this.status)
-	                    console.log(xhr.responseText);
-	                }
-	            };
-	 
-	            // Converting JSON data to string
-	            var data = { "title": "messaggio 1", "text": "vediamo de questo messaggio va" };
-	 
-	            // Sending data with the request
-	            xhr.send(JSON.stringify(data));
-	            //xhr.send(data);
-	        }  
-*/
+				<button type="button" class="btn btn-outline-light btn-lg px-4"
+					onclick="sendJSON_All('dispatchEventJSON', false, null)">sendJSON</button>
+				<button type="button" class="btn btn-outline-light btn-lg px-4"
+					onclick="send100JSON_All('dispatchEventJSON')">send100JSON</button>
+				<button type="button" class="btn btn-outline-light btn-lg px-4"
+					onclick="sendJSON_All('dispatch100EventJSON', false, null)">rep100JSON</button>
+			</form>
+		</main>
+	</div>
 
-		</script>
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js">
 		
+	</script>
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/webResources/js/message-sender.js">
 		
+	</script>
+
 </body>
 </html>

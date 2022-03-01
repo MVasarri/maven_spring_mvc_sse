@@ -1,7 +1,5 @@
 package com.luv2code.springdemo.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,27 +8,26 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="client" )
+@Table(name = "client")
 public class Client {
-	
-	@Id
-	//@GeneratedValue(strategy=GenerationType.AUTO )IDENTITY
-	@GeneratedValue(strategy=GenerationType.IDENTITY )
-	@Column(name="id")
-	private Long databaseClientID;
-	
-	@Column(name="clientID")
-	private String clientID;
-	//new Date()
-	
-	@Column(name="lastConnection")
-	private Long lastConnection;
 
-	public Long getLastConnection() {
+	@Id
+	// @GeneratedValue(strategy=GenerationType.AUTO )IDENTITY
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long databaseClientID;
+
+	@Column(name = "clientID")
+	private String clientID;
+
+	@Column(name = "lastConnection")
+	private String lastConnection;
+
+	public String getLastConnection() {
 		return lastConnection;
 	}
 
-	public void setLastConnection(Long lastConnection) {
+	public void setLastConnection(String lastConnection) {
 		this.lastConnection = lastConnection;
 	}
 

@@ -12,19 +12,21 @@ import com.luv2code.springdemo.entity.Client;
 @Service
 @Transactional
 public class ClientServiceImpl implements ClientService {
-	
-    // need to inject address dao
-    @Autowired
-    private ClientDAO clientDAO;
-	
+
+	// need to inject address dao
+	@Autowired
+	private ClientDAO clientDAO;
+
 	@Override
 	public void saveClient(Client theClient) {
 		clientDAO.saveClient(theClient);
 	}
+
 	@Override
-	public List<Client> getClients(){
-		return clientDAO.getAllClients();	
+	public List<Client> getClients() {
+		return clientDAO.getAllClients();
 	}
+
 	@Override
 	public Client getClient(String clientID) {
 		return clientDAO.getClient(clientID);

@@ -1,4 +1,4 @@
- package com.luv2code.springdemo.entity;
+package com.luv2code.springdemo.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,27 +7,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
- @Table(name="message" )
- public class Message {
-	
+@Table(name = "message")
+public class Message {
+
 	@Id
-	//@GeneratedValue(strategy=GenerationType.AUTO )IDENTITY
-	@GeneratedValue(strategy=GenerationType.IDENTITY )
-	@Column(name="id")
+	// @GeneratedValue(strategy=GenerationType.AUTO )IDENTITY
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long messageID;
-	
-	@Column(name="title")
+
+	@Column(name = "title")
 	private String title;
-	
-	@Column(name="text")
-    private String text;
-	
-//	@Column(name="userID")
-//    private String userID;
-    
-    
+
+	@Column(name = "text")
+	private String text;
+
 	public Long getMessageID() {
 		return messageID;
 	}
@@ -43,29 +38,13 @@ import javax.persistence.Table;
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public String getText() {
 		return text;
 	}
+
 	public void setText(String text) {
 		this.text = text;
 	}
-
-//	public String getUserID() {
-//		return userID;
-//	}
-//
-//	public void setUserID(String userID) {
-//		this.userID = userID;
-//	}
-
-//	@Override
-//	public String toString() {
-//		return "MessageEntityModel [messageID=" + messageID + ", title=" + title + ", text=" + text + ", userID="
-//				+ userID + "]";
-//	}
-
-	
-	
-	
 
 }
