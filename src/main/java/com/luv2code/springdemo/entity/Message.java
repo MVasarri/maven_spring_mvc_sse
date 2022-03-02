@@ -22,6 +22,18 @@ public class Message {
 
 	@Column(name = "text")
 	private String text;
+	
+	@Column(name = "sendingTime")
+	private String sendingTime;
+
+
+	public String getSendingTime() {
+		return sendingTime;
+	}
+
+	public void setSendingTime(String sendingTime) {
+		this.sendingTime = sendingTime;
+	}
 
 	public Long getMessageID() {
 		return messageID;

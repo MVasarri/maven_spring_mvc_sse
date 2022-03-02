@@ -22,9 +22,9 @@
 					<select class="form-select" aria-label="Default select example"
 						id="sTitle">
 						<option selected>Pista N° 1</option>
-						<option value="1">Pista N° 2</option>
-						<option value="2">Pista N° 3</option>
-						<option value="3">Pista N° 4</option>
+						<option >Pista N° 2</option>
+						<option >Pista N° 3</option>
+						<option >Pista N° 4</option>
 					</select>
 
 				</div>
@@ -35,9 +35,9 @@
 					<select class="form-select" aria-label="Default select example"
 						id="sText">
 						<option selected>La Pista leggermente Bagnata</option>
-						<option value="1">Strato Di ghiaccio sulla pista</option>
-						<option value="2">Pista Ben Asciutta</option>
-						<option value="3">Pista allagata e forti venti</option>
+						<option >Strato Di ghiaccio sulla pista</option>
+						<option >Pista Ben Asciutta</option>
+						<option >Pista allagata e forti venti</option>
 					</select>
 				</div>
 

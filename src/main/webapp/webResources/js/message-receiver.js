@@ -69,10 +69,11 @@ function setupEventSource() {
 		console.log(messageData);
 		var el = document.getElementById('ttlMsg').innerHTML = messageData.title;
 		el = document.getElementById('txtMsg').innerHTML = messageData.text;
-		el = document.getElementById('idMsg').innerHTML = "ID messaggio ricevuto: " + messageData.messageID;
-		el = document.getElementById('mPrev').innerHTML = "ID messaggio precedente: " + prevMsgID;
-		el = document.getElementById('nMsg').innerHTML = "numero di messaggi ricevuti: " + nMsg;
-		el = document.getElementById('nDBMsg').innerHTML = "numero di messaggi sul DB: " + nDBMsg;
+		el = document.getElementById('idMsg').innerHTML = messageData.messageID;
+		el = document.getElementById('sTime').innerHTML = messageData.sendingTime;
+		el = document.getElementById('mPrev').innerHTML = prevMsgID;
+		el = document.getElementById('nMsg').innerHTML =  nMsg;
+		el = document.getElementById('nDBMsg').innerHTML = nDBMsg;
 		prevMsgID = messageData.messageID;
 
 	});

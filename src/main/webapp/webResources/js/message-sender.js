@@ -1,18 +1,19 @@
 function sendJSON_All(typeEv, repeat, nRepeat) {
 	var title = document.getElementById("sTitle").value;
 	var text = document.getElementById("sText").value;
+	const d = new Date();
+	var sendingTime = d.toLocaleString() + "." + d.getMilliseconds();
 /*	if (title === '' && text === '') {
 		title = "JSON News All sub - Default";
 		text = "Notizia di Default  è gestita mediante l\' invio di un messaggio di tipo JSON";
 	};*/
 	if(repeat){
-		var dataTime = new Date();
 		console.log('sono entrato, repeat: ');
-	    text = text + '\nclientRip N°: ' + nRepeat + " " + 'Ora di Invio: '+ dataTime.getHours() + ":" + dataTime.getMinutes() + ":" + dataTime.getSeconds()+ ":" + dataTime.getMilliseconds();
+	    text = text + '  clientRip N°: ' + nRepeat;
 	}
 	console.log(title);
 	console.log(text);
-	const data = { title, text };
+	const data = { title, text, sendingTime};
 	const options = {
 		method: 'POST',
 		headers: {

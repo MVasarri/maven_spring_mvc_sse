@@ -1,6 +1,7 @@
 package com.luv2code.springdemo.component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -31,7 +32,11 @@ public class AsyncMessageSseEComponent {
 				Thread.sleep(1000);
 				Message m = new Message();
 				m.setTitle(message.getTitle());
-				m.setText(message.getText() + "\nserverRip N°:"+ i + " Ora di Reindirizzo: " + LocalDateTime.now().toString());
+				m.setText(message.getText() + "   serverRip N°:"+ i);
+			    LocalDateTime myDateObj = LocalDateTime.now();
+			    DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss.ns");
+			    String formattedDate = myDateObj.format(myFormatObj);				
+			    m.setSendingTime(formattedDate);
 				String messagString = messageService.saveAndGetJSON(m);
 				messageService.dispatchEventJSON(messagString, m.getMessageID());
 			} catch (final InterruptedException e) {

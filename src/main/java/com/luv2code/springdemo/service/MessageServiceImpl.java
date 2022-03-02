@@ -2,6 +2,7 @@ package com.luv2code.springdemo.service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,10 @@ public class MessageServiceImpl implements MessageService {
 		if (client == null) {
 			Client subClient = new Client();
 			subClient.setClientID(userID);
-			subClient.setLastConnection(LocalDateTime.now().toString());
+		    LocalDateTime myDateObj = LocalDateTime.now();
+		    DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss.ns");
+		    String formattedDate = myDateObj.format(myFormatObj);	
+			subClient.setLastConnection(formattedDate);
 			clientService.saveClient(subClient);
 		} else {
 			client.setLastConnection(LocalDateTime.now().toString());
