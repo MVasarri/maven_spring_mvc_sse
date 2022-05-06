@@ -3,7 +3,7 @@
 <html>
 
 <head>
-<title>Main Page</title>
+<title>Airport runway condition - Home Page</title>
 <link type="text/css" rel="stylesheet"
 	href="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/css/bootstrap.min.css">
 </head>
@@ -12,20 +12,17 @@
 	<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 		<main class=" px-4 py-5">
 			<div class="py-5">
-				<h1 class="display-5 fw-bold text-white">Spring MVC Demo - Home
-					Page</h1>
+				<h1 class="display-5 fw-bold text-white">Airport runway condition - Home Page</h1>
 				<div class="col-lg-6 mx-auto">
-					<p class="fs-5 mb-4">Accedi alla pagina di invio messaggi o
-						alla pagina di ricezione messaggi</p>
 					<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
 						<button type="button" 
 							class="btn btn-outline-light btn-lg px-4"
 							onclick="window.location.href='messageSender'; return false;">
-							Message Sender</button>
+							Make report</button>
 						<button type="button"
 							class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold"
 							onclick="window.location.href='messageReceiver'; return false;">
-							Message Receiver</button>
+							View report</button>
 					</div>
 				</div>
 			</div>

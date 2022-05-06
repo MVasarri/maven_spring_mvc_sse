@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Message Receiver</title>
+<title>View report</title>
 <link type="text/css" rel="stylesheet"
 	href="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/css/bootstrap.min.css">
 
@@ -13,8 +13,7 @@
 	<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 		<header class="row">
 			<div class="col-9 ">
-				<h1 class=" mb-0 display-5 fw-bold text-white">Message
-					Receiver</h1>
+				<h1 class=" mb-0 display-5 fw-bold text-white">View report</h1>
 			</div>
 			<div class="col-3 ">
 				<h3 class="mb-0">
@@ -26,9 +25,9 @@
 		<main class="px-4 py-5 ">
 			<div class="card text-center">
 				<div class="row card-header">
-					<div class="col-9 ">Message</div>
+					<div class="col-9 ">Report</div>
 					<div class="col-3 ">
-						msgID: <span id="idMsg"></span>
+						RID: <span id="idMsg"></span>
 					</div>
 				</div>
 				<div class="row card-body">
@@ -40,10 +39,10 @@
 				<div class="collapse" id="collapseExample">
 					<div class="card card-body">
 						<p>
-							ID msg precedente: <span id="mPrev"></span>
+							RID prev: <span id="mPrev"></span>
 						</p>
 						<p>
-							N° msg sul DB: <span id="nDBMsg"></span>
+							N° of Report on the DB: <span id="nDBMsg"></span>
 						</p>
 					</div>
 				</div>
@@ -65,7 +64,7 @@
 						</button>
 					</div>
 					<div class="col-5 mb-0">
-						N° msg received: <span id="nMsg"></span>
+						N° Report received: <span id="nMsg"></span>
 					</div>
 				</div>
 			</div>
