@@ -15,21 +15,21 @@
 			<h1 class="display-5 fw-bold text-white">Make report</h1>
 			<form>
 				<div class="mb-3">
-					<label for="sTitle" class="form-label"> Select airstrip to report</label>
+					<label for="sTitle" class="form-label"> Select runway to report</label>
 					<!-- 					<input
 						type="text" class="form-control" id="sTitle"
 						aria-describedby="titleHelp"> -->
 					<select class="form-select" aria-label="Default select example"
 						id="sTitle">
-						<option selected>Airstrip N° 1</option>
-						<option >Airstrip N° 2</option>
-						<option >Airstrip N° 3</option>
-						<option >Airstrip N° 4</option>
+						<option selected>Runway N° 1</option>
+						<option >Runway N° 2</option>
+						<option >Runway N° 3</option>
+						<option >Runway N° 4</option>
 					</select>
 
 				</div>
 				<div class="mb-3">
-					<label for="sText" class="form-label">select airstrip status</label>
+					<label for="sText" class="form-label">Select runway status</label>
 					<!-- 				<input
 						type="text" class="form-control" id="sText"> -->
 					<select class="form-select" aria-label="Default select example"

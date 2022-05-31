@@ -42,7 +42,7 @@
 							RID prev: <span id="mPrev"></span>
 						</p>
 						<p>
-							N° of Report on the DB: <span id="nDBMsg"></span>
+							N&#176 of Report on the DB: <span id="nDBMsg"></span>
 						</p>
 					</div>
 				</div>
@@ -64,7 +64,7 @@
 						</button>
 					</div>
 					<div class="col-5 mb-0">
-						N° Report received: <span id="nMsg"></span>
+						N&#176 Report received: <span id="nMsg"></span>
 					</div>
 				</div>
 			</div>
