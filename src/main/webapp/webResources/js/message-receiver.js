@@ -52,12 +52,14 @@ function setupEventSource() {
 
 	eventSource.onopen = (event) => {
 		staCon(eventSource.readyState);
+		console.log(event.status);
 		reconnectFrequencySeconds = 1;
 		console.log("Evento Open ricevuto, evento open ricevuto senza implementazione sul server :", event);
 	};
 
 	//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
 	eventSource.addEventListener("latestMsg", (event) => {
+		console.log(event.status);
 		nMsg += 1;
 		console.log("Ricevuto evento", event);
 		staCon(eventSource.readyState);
@@ -79,7 +81,9 @@ function setupEventSource() {
 	});
 
 	eventSource.addEventListener("error", (event) => {
-		console.log("Error occured: ", event);
+ console.log('connection state: ' + eventSource.readyState + ', error: ' + event);
+		console.log(event);
+		console.log(event.status);
 		if (eventSource.readyState == EventSource.CLOSED) {
 			console.log('connection è già closed');
 		} else {
