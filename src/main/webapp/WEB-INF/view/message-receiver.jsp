@@ -1,165 +1,97 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 <head>
-        <meta charset="ISO-8859-1">
-        <title>Insert title here</title>
-        <style>
-            .grid-container {
-                display: grid;
-                grid-template-columns: auto auto auto;
-                background-color: #2196F3;
-                padding: 10px;
-            }
-        </style>
+<meta charset="ISO-8859-1">
+<title>View report</title>
+<link type="text/css" rel="stylesheet"
+	href="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/css/bootstrap.min.css">
+
 </head>
-<body>		
+<body class="d-flex h-100 text-center text-secondary bg-dark">
+	<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+		<header class="row">
+			<div class="col-9 ">
+				<h1 class=" mb-0 display-5 fw-bold text-white">View report</h1>
+			</div>
+			<div class="col-3 ">
+				<h3 class="mb-0">
+					User ID: <span id="userID"></span>
+				</h3>
+			</div>
+		</header>
 
-	<div>
-        <h1>News sse client</h1>
-        <h4>User ID: <span id="userID"></span></h4>
-    </div>
+		<main class="px-4 py-5 ">
+			<div class="card text-center">
+				<div class="row card-header">
+					<div class="col-9 ">Report</div>
+					<div class="col-3 ">
+						RID: <span id="idMsg"></span>
+					</div>
+				</div>
+				<div class="row card-body">
+					<div >
+						<h2 id="ttlMsg" class="card-title fw-bold "></h2>
+						<h5 id="txtMsg" class="card-text"></h5>
+					</div>
+				</div>
+				<div class="collapse" id="collapseExample">
+					<div class="card card-body">
+						<p>
+							RID prev: <span id="mPrev"></span>
+						</p>
+						<p>
+							N&#176 of Report on the DB: <span id="nDBMsg"></span>
+						</p>
+					</div>
+				</div>
+				<div class="row card-footer text-muted">
+					<div class="col-5 mb-0"><span id="sTime"></span></div>
+					<div class="col-2 mb-0">
+						<!-- Button trigger modal -->
+						<button type="button" class="btn btn-secondary"
+							data-bs-toggle="collapse" data-bs-target="#collapseExample"
+							aria-expanded="false" aria-controls="collapseExample">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+								fill="currentColor" class="bi bi-info-square"
+								viewBox="0 0 16 16">
+  								<path
+									d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
+  								<path
+									d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="col-5 mb-0">
+						N&#176 Report received: <span id="nMsg"></span>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
 
-    <div class="grid-container">
-        <div id="sseNews1">
-        	<h6 id="ttlNews"></h6>
-        	<p id="txtNews"></p>
-        	<p id="idNews"></p>
-        	<p id="nNews"></p>
-        	<p id="lastNews"></p>
-        	<p id="mLost"></p>
-        	
-        
-        </div> 
-    </div>
+	<!-- 	<div class="grid-container">
+		<div id="sseMsg">
+			<h6 id="ttlMsg"></h6>
+			<p id="txtMsg"></p>
+			<p id="idMsg"></p>
+			<p id="mPrev"></p>
+			<p id="nMsg"></p>
+			<p id="nDBMsg"></p>
+			<p id="lastMsg"></p>
+		</div>
+	</div> -->
 
-    <script type="text/javascript">
-    
-   		var nNews = 0;
-
-		var userID = Math.floor((Math.random() * 1000) + 1);
-		var sp1 = document.getElementById('userID');
-		sp1.textContent = userID;
-		//url dove va ad ascoltare l'evento SseEmitter
-		var url = null;
-
-		var eventSource;
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/webResources/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js">
 		
-		var reconnectFrequencySeconds = 1;
-		// Putting these functions in extra variables is just for the sake of readability
-		var waitFunc = function() { return reconnectFrequencySeconds * 1000 };
+	</script>
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/webResources/js/message-receiver.js">
 		
-		var tryToSetupFunc = function() {
-		    setupEventSource();
-		    reconnectFrequencySeconds *= 2;
-		    if (reconnectFrequencySeconds >= 64) {
-		        reconnectFrequencySeconds = 64;
-		    }
-		};	
-		
-		var reconnectFunc = function() { setTimeout(tryToSetupFunc, waitFunc()) };
-		
-		var staCon =	function statoConnesssione(test) {
-		 	console.log("Stato Connessione");
-			switch (test) {
-		         case 0:
-					 console.log("0 - connecting ti Stai connettendo");
-		             break;
-		         case 1:
-					 console.log("1 - open la connessione aperta");
-		             break;
-		         case 2:
-					 console.log("2 - closed la connessione è chiusa");
-		             break;
-		         default:
-		             throw new IllegalArgumentException("Invalid day of the week: " + dayOfWeekArg);
-	     	}
-		};
-				
-		function setupEventSource() {
-			console.log("SUBSCRIBE");
-			url = '/maven-spring-mvc-sse/subscribe?userID=' + userID + '&nNews=' + nNews;
-			eventSource = new EventSource(url); //creo un evento per inscriversi al Sse
-													// se andiamo a controllare sul browser vedremo che subscription è un "text/event-stream"
-			console.log(eventSource);
-			staCon(eventSource.readyState);
-				
-			eventSource.addEventListener("INIT", (event) => {
-			    console.log("Evento INIT ricevuto, connessione con il server avviata:", event);
-			});
-				
-			eventSource.onopen = (event) => {
-				staCon(eventSource.readyState);
-			    reconnectFrequencySeconds = 1;
-			    console.log("Evento Open ricevuto, evento open ricevuto senza implementazione sul server :", event);
-			};
-							
-			//creo un evento ascoltatore "latestNews" che ascoltera l'evento con il medesimo ordine del server
-			eventSource.addEventListener("latestNews", (event) => {
-				console.log("Ricevuto evento", event);
-			    staCon(eventSource.readyState);
-			    const articleData = JSON.parse(event.data);
-			    //const articleData = event.data;
-				console.log("ultimo id evento ricevuto", event.lastEventId);
-			    
-			    console.log(articleData);
-			    var el = document.getElementById('ttlNews').innerHTML = articleData.title;
-			    var el = document.getElementById('txtNews').innerHTML = articleData.text;							    
-			    var el = document.getElementById('idNews').innerHTML = articleData.userID;
-			    var el = document.getElementById('nNews').innerHTML = "ID messaggio aspettato: " + nNews;
-			    var el = document.getElementById('lastNews').innerHTML = "ID messaggio ricevuto: " + parseInt(event.lastEventId);
-		    	var mLost = (parseInt(event.lastEventId) - nNews);
-		    	var el = document.getElementById('mLost').innerHTML = "Sono stati perzi "+ mLost+ " messaggi";
-
-			    nNews = nNews +1;
-/* 							    
-				var el = document.getElementById('sseNews1');
-			    el.appendChild(document.createTextNode(articleData.title));
-			    el.appendChild(document.createElement('br'));
-			    el.appendChild(document.createTextNode(articleData.text));
-			    el.appendChild(document.createElement('br'));
-			    el.appendChild(document.createTextNode(articleData.userID));
-			    el.appendChild(document.createElement('br'));
-			    el.appendChild(document.createElement('br')); 
-*/
-				});
-		
-			eventSource.addEventListener("error", (event) => {
-				console.log("Error occured: ", event);  
-				if (eventSource.readyState == EventSource.CLOSED) {
-				   	console.log('connection è già closed');
-				} else {
-					console.log('è successo un qualche altro errore la connessione la chiusa');
-				}
-				eventSource.close();
-			    reconnectFunc();
-			});	
-							
-/* 				
-				window.addEventListener('online', (event) => {
-					if (eventSource.readyState == EventSource.CLOSED) {
-						console.log('ricreata nuova connessione eventSource');
-						reconnectFunc();
-					}
-				}); 
-*/
-		};		
-										
-		setupEventSource(staCon);
-				
-		// puoi aggiungere anche alcuni eventi quando ci sono errori puoi chiudere semplicemente l'eventSources
-			
-		// onbeforeunload cioè quando la finestra viene scaricata chiude l'eventSources
-		window.addEventListener("beforeunload", function(event) { 
-		    console.log("on before unload");
-		    eventSource.close();
-		    fetch( '/maven-spring-mvc-sse/unsubscribe?userID=' + userID );
-			console.log('unsubscribe lanciata');
-		});
-
-   	</script>
+	</script>
 
 
-    </body>
+</body>
 </html>

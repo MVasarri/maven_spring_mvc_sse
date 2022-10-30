@@ -1,30 +1,17 @@
 package com.luv2code.springdemo.service;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.luv2code.springdemo.entity.MessageEntityModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.luv2code.springdemo.entity.Message;
 
 public interface MessageService {
-    public SseEmitter subscribe(String userID, Integer nNews);  
-    
-    public void /*String*/ dispatchEventJSON(MessageEntityModel message) throws Exception;
-    
-    public void unsubscribe(String userID);
-    
-	//public void saveMessage(MessageEntityModel theMessage);
+	public SseEmitter subscribe(String userID, Integer prevMsgID);
 
-    //public List<MessageEntityModel> getMessage();
-   
+	public void dispatchEventJSON(String JSON, Long messageID);
 
+	public void unsubscribe(String userID);
 
+	public String saveAndGetJSON(Message message) throws JsonProcessingException;
 
-
-    
-
-	
 }

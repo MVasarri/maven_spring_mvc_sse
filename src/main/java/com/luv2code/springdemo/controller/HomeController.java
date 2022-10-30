@@ -5,16 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
 @Controller
 public class HomeController {
-	
-    private static final Logger logger 
-    	= LoggerFactory.getLogger(HomeController.class);
-		
+
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
 	@RequestMapping("/")
-	public String showPage( ) {
-		
+	public String showPage() {
+
 		logger.trace("1. Log a message at the TRACE level");
 		logger.debug("2. Log a message at the DEBUG level");
 		logger.info("3. Log a message at the INFO level");
@@ -23,14 +21,14 @@ public class HomeController {
 
 		return "main-menu";
 	}
-	
+
 	@RequestMapping("/messageReceiver")
-	public String showPageNews( ) {
+	public String showPageNews() {
 		return "message-receiver";
 	}
-	
+
 	@RequestMapping("/messageSender")
-	public String showPageNewsSender( ) {
+	public String showPageNewsSender() {
 		return "message-sender";
 	}
 
